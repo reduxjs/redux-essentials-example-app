@@ -1,0 +1,258 @@
+:root {
+  --redux-color: #764abc;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+p {
+  font-size: 1.1rem;
+}
+
+/* Navbar */
+
+nav {
+  display: flex;
+  padding: 0;
+  background: var(--redux-color);
+}
+
+nav section {
+  width: 100%;
+}
+
+nav section h1,
+nav section {
+  color: white;
+}
+
+nav a,
+nav a:active {
+  font-weight: 700;
+  padding: 0.25rem 1.5rem;
+  border-radius: 4px;
+  color: white !important;
+  background: #481499;
+}
+
+nav a:first-of-type {
+  margin-left: -1.5rem;
+}
+
+nav a:hover {
+  color: white;
+  background: #926bcf;
+}
+
+.navContent {
+  display: flex;
+  justify-content: space-between;
+}
+
+.navLinks {
+  display: flex;
+}
+
+.navLinks a {
+  margin-left: 5px;
+}
+
+.navLinks a .badge {
+  margin-left: 5px;
+  position: relative;
+  top: -3px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.25em 0.4em;
+  font-size: 75%;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.25rem;
+  color: #212529;
+  background-color: #f8f9fa;
+}
+
+.navLinks :first-child {
+  margin-left: 0;
+}
+
+/* Main content */
+
+section {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 1.5rem;
+}
+
+section h1 {
+  font-size: 3rem;
+}
+
+/* Posts list */
+
+.post h2 {
+  font-size: 2.5rem;
+  margin-bottom: 5px;
+}
+
+.post-excerpt {
+  padding: 0.25rem 0.25rem;
+  border: 1px solid rgb(177, 174, 174);
+  border-radius: 7px;
+}
+
+.posts-list .post-excerpt + .post-excerpt {
+  margin-top: 0.5rem;
+}
+
+.post-excerpt h3 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+p.post-content {
+  margin-top: 10px;
+}
+
+.button {
+  display: inline-block;
+  background: #1976d2;
+  color: white;
+  border-radius: 4px;
+  font-weight: 700;
+  padding: 0.75rem 1.5rem;
+}
+
+button:disabled,
+button:disabled:hover {
+  opacity: 0.5;
+}
+
+button.reaction-button {
+  border: 1px solid #e0e3e9;
+  padding: 5px 10px;
+  margin: 5px 6px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+/* https://projects.lukehaas.me/css-loaders/ , Loader #3 */
+.loader {
+  font-size: 10px;
+  margin: 50px auto;
+  text-indent: -9999em;
+  width: 5em;
+  height: 5em;
+  border-radius: 50%;
+  background: var(--redux-color);
+  background: -moz-linear-gradient(
+    left,
+    var(--redux-color) 10%,
+    rgba(128, 0, 255, 0) 42%
+  );
+  background: -webkit-linear-gradient(
+    left,
+    var(--redux-color) 10%,
+    rgba(128, 0, 255, 0) 42%
+  );
+  background: -o-linear-gradient(
+    left,
+    var(--redux-color) 10%,
+    rgba(128, 0, 255, 0) 42%
+  );
+  background: -ms-linear-gradient(
+    left,
+    var(--redux-color) 10%,
+    rgba(128, 0, 255, 0) 42%
+  );
+  background: linear-gradient(
+    to right,
+    var(--redux-color) 10%,
+    rgba(128, 0, 255, 0) 42%
+  );
+  position: relative;
+  -webkit-animation: load3 1.4s infinite linear;
+  animation: load3 1.4s infinite linear;
+  -webkit-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+.loader:before {
+  width: 50%;
+  height: 50%;
+  background: var(--redux-color);
+  border-radius: 100% 0 0 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  content: '';
+}
+
+.loader:after {
+  background: #ffffff;
+  width: 75%;
+  height: 75%;
+  border-radius: 50%;
+  content: '';
+  margin: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+@-webkit-keyframes load3 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes load3 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+/* Notifications list */
+
+.notification {
+  border: 1px solid #eee;
+  padding: 0.5rem;
+}
+
+.notificationsList .notification + .notification {
+  border-top: none;
+}
+
+.notification.new {
+  background-color: rgba(29, 161, 242, 0.1);
+}
