@@ -28,3 +28,11 @@ export async function client(endpoint, { body, ...customConfig } = {}) {
     return Promise.reject(err.message ? err.message : data)
   }
 }
+
+client.get = function (endpoint, customConfig = {}) {
+  return client(endpoint, { ...customConfig, method: 'GET' })
+}
+
+client.post = function (endpoint, body, customConfig = {}) {
+  return client(endpoint, { ...customConfig, body })
+}

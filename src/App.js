@@ -7,13 +7,19 @@ import { client } from './api/client'
 
 function App() {
   const fetchMovies = async () => {
-    const movies = await client('/api/movies')
-    console.log(movies)
+    const promises = ['users', 'posts', 'comments'].map((name) =>
+      client.get(`/fakeApi/${name}`)
+    )
+    const [users, posts, comments] = await Promise.all(promises)
+    console.log({ users, posts, comments })
+
+    const post = await client(`/fakeApi/posts/1`)
+    console.log(post)
   }
 
   const fetchFailure = async () => {
     try {
-      await client('/fakeApi/doesNotExist')
+      await client.get('/fakeApi/doesNotExist')
     } catch (err) {
       console.error(err)
     }
