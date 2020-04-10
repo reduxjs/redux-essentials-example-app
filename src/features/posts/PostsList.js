@@ -7,7 +7,7 @@ export const PostsList = () => {
   const renderedPosts = posts.map((post) => (
     <article className={'post-excerpt'}>
       <h2>{post.title}</h2>
-      <p>{post.text.substring(0, 100)}</p>
+      <p>{post.content.substring(0, 100)}</p>
     </article>
   ))
 
