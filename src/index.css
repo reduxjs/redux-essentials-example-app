@@ -26,6 +26,10 @@ nav section {
   width: 100%;
 }
 
+nav section h1 {
+  color: white;
+}
+
 nav a {
   font-weight: 700;
   padding: 1rem 1.5rem;
