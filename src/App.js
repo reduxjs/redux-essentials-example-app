@@ -11,6 +11,7 @@ import { client } from './api/client'
 
 import { PostsList } from './features/posts/PostsList'
 import { AddPostForm } from './features/posts/AddPostForm'
+import { SinglePostPage } from './features/posts/SinglePostPage'
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
         <Switch>
           <Route exact path="/" component={PostsList} />
           <Route exact path="/addPost" component={AddPostForm} />
+          <Route exact path="/posts/:id" component={SinglePostPage} />
           <Redirect to="/" />
         </Switch>
       </div>
