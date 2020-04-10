@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 
 import { fetchPosts } from './postsSlice'
 
-const Post = ({ post }) => (
+const PostExcerpt = ({ post }) => (
   <article className="post-excerpt">
     <h2>{post.title}</h2>
     <p>{post.content.substring(0, 100)}</p>
@@ -20,7 +20,9 @@ export const PostsList = () => {
     }
   }, [posts, dispatch])
 
-  const renderedPosts = posts.map((post) => <Post key={post.id} post={post} />)
+  const renderedPosts = posts.map((post) => (
+    <PostExcerpt key={post.id} post={post} />
+  ))
 
   return (
     <section>
