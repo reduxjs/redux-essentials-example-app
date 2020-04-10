@@ -1,9 +1,7 @@
 import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
-import { client } from '../../api/client'
-
-import { postsLoaded } from './postsSlice'
+import { fetchPosts } from './postsSlice'
 
 const Post = ({ post }) => (
   <article className="post-excerpt">
@@ -17,12 +15,8 @@ export const PostsList = () => {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    async function fetchPosts() {
-      const response = await client.get('/fakeApi/posts')
-      dispatch(postsLoaded(response.posts))
-    }
     if (posts.length === 0) {
-      fetchPosts()
+      dispatch(fetchPosts())
     }
   }, [posts, dispatch])
 
