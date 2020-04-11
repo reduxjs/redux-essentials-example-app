@@ -17,6 +17,19 @@ const IdSerializer = Serializer.extend({
 })
 
 new Server({
+  routes() {
+    this.namespace = 'fakeApi'
+    //this.timing = 2000
+
+    this.resource('users')
+    this.resource('posts')
+    this.resource('comments')
+
+    this.get('/posts/:postId/comments', (schema, req) => {
+      const post = schema.posts.find(req.params.postId)
+      return post.comments
+    })
+  },
   models: {
     user: Model.extend({
       posts: hasMany(),
@@ -91,12 +104,5 @@ new Server({
   },
   seeds(server) {
     server.createList('user', 5)
-  },
-  routes() {
-    this.namespace = 'fakeApi'
-
-    this.resource('users')
-    this.resource('posts')
-    this.resource('comments')
   },
 })
