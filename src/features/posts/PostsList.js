@@ -19,10 +19,8 @@ export const PostsList = () => {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    if (posts.length === 0) {
-      dispatch(fetchPosts())
-    }
-  }, [posts, dispatch])
+    dispatch(fetchPosts())
+  }, [dispatch])
 
   const renderedPosts = posts.map((post) => (
     <PostExcerpt key={post.id} post={post} />
