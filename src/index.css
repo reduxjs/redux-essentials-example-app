@@ -18,15 +18,16 @@ p {
 
 nav {
   display: flex;
-  padding: 2rem 0;
-  background: #111;
+  padding: 0;
+  background: #764abc;
 }
 
 nav section {
   width: 100%;
 }
 
-nav section h1 {
+nav section h1,
+nav section {
   color: white;
 }
 
@@ -41,11 +42,11 @@ nav a:first-of-type {
 }
 
 nav a:hover {
-  background: #222;
+  background: gray;
 }
 
 a {
-  color: #1976d2;
+  color: white;
   text-decoration: none;
 }
 

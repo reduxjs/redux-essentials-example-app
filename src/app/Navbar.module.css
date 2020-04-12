@@ -1,0 +1,12 @@
+.navContent {
+  display: flex;
+  justify-content: space-between;
+}
+
+.navLinks a {
+  margin-left: 5px;
+}
+
+.navLinks :first-child {
+  margin-left: 0;
+}

@@ -9,6 +9,7 @@ import {
 
 import { client } from './api/client'
 
+import { Navbar } from './app/Navbar'
 import { PostsList } from './features/posts/PostsList'
 import { AddPostForm } from './features/posts/AddPostForm'
 import { SinglePostPage } from './features/posts/SinglePostPage'
@@ -16,15 +17,8 @@ import { SinglePostPage } from './features/posts/SinglePostPage'
 function App() {
   return (
     <Router>
+      <Navbar />
       <div className="App">
-        <nav>
-          <section>
-            <h1>Redux Quick Start Example</h1>
-
-            <Link to="/">Posts</Link>
-            <Link to="/addPost">Add New Post</Link>
-          </section>
-        </nav>
         <Switch>
           <Route exact path="/" component={PostsList} />
           <Route exact path="/addPost" component={AddPostForm} />
