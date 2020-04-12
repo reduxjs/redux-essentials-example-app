@@ -77,9 +77,17 @@ new Server({
       content() {
         return faker.lorem.paragraphs(3)
       },
-
+      reactions() {
+        return {
+          thumbsUp: 0,
+          hooray: 0,
+          heart: 0,
+          rocket: 0,
+          eyes: 0,
+        }
+      },
       afterCreate(post, server) {
-        server.createList('comment', 3, { post })
+        //server.createList('comment', 3, { post })
       },
 
       user: association(),
@@ -103,6 +111,6 @@ new Server({
     comment: IdSerializer,
   },
   seeds(server) {
-    server.createList('user', 5)
+    server.createList('user', 3)
   },
 })
