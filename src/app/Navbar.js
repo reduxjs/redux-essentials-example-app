@@ -6,6 +6,15 @@ import styles from './Navbar.module.css'
 
 export const Navbar = () => {
   const totalPosts = useSelector((state) => state.posts.length)
+
+  const totalComments = useSelector((state) => {
+    let numComments = 0
+    state.posts.forEach((post) => {
+      numComments += post.commentIds.length
+    })
+    return numComments
+  })
+
   return (
     <nav>
       <section>
@@ -20,7 +29,9 @@ export const Navbar = () => {
               Add New Post
             </Link>
           </div>
-          <div>Total posts: {totalPosts}</div>
+          <div>
+            Posts: {totalPosts}, comments: {totalComments}
+          </div>
         </div>
       </section>
     </nav>
