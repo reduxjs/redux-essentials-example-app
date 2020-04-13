@@ -6,13 +6,14 @@ import {
   belongsTo,
   hasMany,
   association,
+  RestSerializer,
 } from 'miragejs'
 
 import { nanoid } from '@reduxjs/toolkit'
 
 import faker from 'faker'
 
-const IdSerializer = Serializer.extend({
+const IdSerializer = RestSerializer.extend({
   serializeIds: 'always',
 })
 
@@ -24,6 +25,14 @@ new Server({
     this.resource('users')
     this.resource('posts')
     this.resource('comments')
+
+    const server = this
+
+    this.post('/posts', function (schema, req) {
+      const data = this.normalizedRequestAttrs()
+      const result = server.create('post', data)
+      return result
+    })
 
     this.get('/posts/:postId/comments', (schema, req) => {
       const post = schema.posts.find(req.params.postId)
