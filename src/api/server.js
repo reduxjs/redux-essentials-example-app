@@ -12,6 +12,7 @@ import {
 import { nanoid } from '@reduxjs/toolkit'
 
 import faker from 'faker'
+import { sentence, paragraph, article } from 'txtgen'
 
 const IdSerializer = RestSerializer.extend({
   serializeIds: 'always',
@@ -78,13 +79,13 @@ new Server({
         return nanoid()
       },
       title() {
-        return faker.lorem.sentence()
+        return sentence()
       },
       date() {
         return faker.date.past(3)
       },
       content() {
-        return faker.lorem.paragraphs(3)
+        return article(3)
       },
       reactions() {
         return {
@@ -109,7 +110,7 @@ new Server({
         return faker.date.past(2)
       },
       text() {
-        return faker.lorem.paragraph()
+        return paragraph()
       },
       post: association(),
     }),
