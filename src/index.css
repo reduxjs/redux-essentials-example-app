@@ -94,3 +94,8 @@ section h1 {
   font-weight: 700;
   padding: 0.75rem 1.5rem;
 }
+
+button:disabled,
+button:disabled:hover {
+  opacity: 0.5;
+}

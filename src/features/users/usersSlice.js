@@ -15,6 +15,13 @@ const usersSlice = createSlice({
 
 export const { usersLoaded } = usersSlice.actions
 
+const usersSelectors = usersAdapter.getSelectors((state) => state.users)
+
+export const {
+  selectAll: selectAllUsers,
+  selectById: selectUserById,
+} = usersSelectors
+
 export default usersSlice.reducer
 
 export const fetchUsers = () => async (dispatch) => {
