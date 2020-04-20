@@ -20,7 +20,16 @@ function App() {
       <Navbar />
       <div className="App">
         <Switch>
-          <Route exact path="/" component={PostsList} />
+          <Route
+            exact
+            path="/"
+            render={() => (
+              <React.Fragment>
+                <AddPostForm />
+                <PostsList />
+              </React.Fragment>
+            )}
+          />
           <Route exact path="/addPost" component={AddPostForm} />
           <Route exact path="/posts/:id" component={SinglePostPage} />
           <Redirect to="/" />
