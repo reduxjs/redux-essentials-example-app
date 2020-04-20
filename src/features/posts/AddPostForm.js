@@ -1,8 +1,5 @@
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { nanoid } from '@reduxjs/toolkit'
-import { useHistory } from 'react-router-dom'
-
 import { postAdded } from './postsSlice'
 
 export const AddPostForm = () => {
@@ -10,22 +7,15 @@ export const AddPostForm = () => {
   const [content, setContent] = useState('')
 
   const dispatch = useDispatch()
-  const history = useHistory()
 
   const onTitleChanged = (e) => setTitle(e.target.value)
   const onContentChanged = (e) => setContent(e.target.value)
 
   const onSavePostClicked = () => {
     if (title && content) {
-      dispatch(
-        postAdded({
-          id: nanoid(),
-          title,
-          content,
-        })
-      )
-
-      history.push('/')
+      dispatch(postAdded(title, content))
+      setTitle('')
+      setContent('')
     }
   }
 
@@ -38,6 +28,7 @@ export const AddPostForm = () => {
           type="text"
           id="postTitle"
           name="postTitle"
+          placeholder="What's on your mind?"
           value={title}
           onChange={onTitleChanged}
         />
