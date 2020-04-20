@@ -85,7 +85,7 @@ new Server({
         return faker.date.past(3)
       },
       content() {
-        return article(3)
+        return article(1)
       },
       reactions() {
         return {
