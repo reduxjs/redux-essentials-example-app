@@ -31,7 +31,7 @@ export const AddPostForm = () => {
 
   return (
     <section>
-      <h1>Add a New Post</h1>
+      <h2>Add a New Post</h2>
       <form>
         <label>Post Title:</label>
         <input

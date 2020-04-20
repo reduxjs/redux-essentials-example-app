@@ -6,7 +6,7 @@ import { fetchPosts } from './postsSlice'
 
 const PostExcerpt = ({ post }) => (
   <article className="post-excerpt">
-    <h2>{post.title}</h2>
+    <h3>{post.title}</h3>
     <p>{post.content.substring(0, 100)}</p>
     <Link to={`/posts/${post.id}`} className="button">
       View Post
@@ -28,7 +28,7 @@ export const PostsList = () => {
 
   return (
     <section>
-      <h1>Posts</h1>
+      <h2>Posts</h2>
       {renderedPosts}
     </section>
   )
