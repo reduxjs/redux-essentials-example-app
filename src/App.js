@@ -7,11 +7,10 @@ import {
   Link,
 } from 'react-router-dom'
 
-import { client } from './api/client'
-
 import { Navbar } from './app/Navbar'
 import { PostsList } from './features/posts/PostsList'
 import { AddPostForm } from './features/posts/AddPostForm'
+import { EditPostForm } from './features/posts/EditPostForm'
 import { SinglePostPage } from './features/posts/SinglePostPage'
 
 function App() {
@@ -31,7 +30,8 @@ function App() {
             )}
           />
           <Route exact path="/addPost" component={AddPostForm} />
-          <Route exact path="/posts/:id" component={SinglePostPage} />
+          <Route exact path="/posts/:postId" component={SinglePostPage} />
+          <Route exact path="/editPost/:postId" component={EditPostForm} />
           <Redirect to="/" />
         </Switch>
       </div>
