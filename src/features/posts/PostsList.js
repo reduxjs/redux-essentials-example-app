@@ -1,18 +1,26 @@
 import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { selectUserById } from '../users/usersSlice'
 
 import { fetchPosts } from './postsSlice'
 
-const PostExcerpt = ({ post }) => (
-  <article className="post-excerpt">
-    <h3>{post.title}</h3>
-    <p>{post.content.substring(0, 100)}</p>
-    <Link to={`/posts/${post.id}`} className="button">
-      View Post
-    </Link>
-  </article>
-)
+const PostExcerpt = ({ post }) => {
+  const author = useSelector((state) => selectUserById(state, post.user))
+
+  return (
+    <article className="post-excerpt">
+      <h3>{post.title}</h3>
+      <span>
+        <i>{author.name}</i>
+      </span>
+      <p>{post.content.substring(0, 100)}</p>
+      <Link to={`/posts/${post.id}`} className="button">
+        View Post
+      </Link>
+    </article>
+  )
+}
 
 export const PostsList = () => {
   const posts = useSelector((state) => state.posts)
