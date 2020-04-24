@@ -2,7 +2,6 @@ import {
   Server,
   Model,
   Factory,
-  Serializer,
   belongsTo,
   hasMany,
   association,

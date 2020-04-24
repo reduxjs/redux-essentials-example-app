@@ -2,11 +2,6 @@ import { createSlice, nanoid } from '@reduxjs/toolkit'
 
 import { client } from '../../api/client'
 
-const initialState = [
-  { id: 1, title: 'First Post!', content: 'Hello!' },
-  { id: 2, title: 'Second Post', content: 'More text' },
-]
-
 const postsSlice = createSlice({
   name: 'posts',
   initialState: [],
