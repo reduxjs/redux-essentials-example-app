@@ -26,11 +26,13 @@ export const PostsList = () => {
   const posts = useSelector((state) => state.posts)
   const dispatch = useDispatch()
 
+  const orderedPosts = posts.slice().reverse()
+
   useEffect(() => {
     dispatch(fetchPosts())
   }, [dispatch])
 
-  const renderedPosts = posts.map((post) => (
+  const renderedPosts = orderedPosts.map((post) => (
     <PostExcerpt key={post.id} post={post} />
   ))
 
