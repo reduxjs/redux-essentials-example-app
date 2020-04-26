@@ -5,8 +5,24 @@ import { selectUserById } from '../users/usersSlice'
 
 import { fetchPosts } from './postsSlice'
 
+const reactionEmoji = {
+  thumbsUp: '👍',
+  hooray: '🎉',
+  heart: '❤️',
+  rocket: '🚀',
+  eyes: '👀',
+}
+
 const PostExcerpt = ({ post }) => {
   const author = useSelector((state) => selectUserById(state, post.user))
+
+  const reactionButtons = Object.entries(reactionEmoji).map(([name, emoji]) => {
+    return (
+      <button key={name} className="muted-button reaction-button">
+        {emoji} {post.reactions[name]}
+      </button>
+    )
+  })
 
   return (
     <article className="post-excerpt">
@@ -14,7 +30,9 @@ const PostExcerpt = ({ post }) => {
       <span>
         <i>{author.name}</i>
       </span>
+      <span> at {post.date}</span>
       <p>{post.content.substring(0, 100)}</p>
+      <div>{reactionButtons}</div>
       <Link to={`/posts/${post.id}`} className="button">
         View Post
       </Link>
