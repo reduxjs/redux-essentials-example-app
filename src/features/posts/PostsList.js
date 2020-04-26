@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { selectUserById } from '../users/usersSlice'
 
-import { fetchPosts } from './postsSlice'
+import { fetchPosts, reactionAdded } from './postsSlice'
 
 const reactionEmoji = {
   thumbsUp: '👍',
@@ -15,10 +15,18 @@ const reactionEmoji = {
 
 const PostExcerpt = ({ post }) => {
   const author = useSelector((state) => selectUserById(state, post.user))
+  const dispatch = useDispatch()
 
   const reactionButtons = Object.entries(reactionEmoji).map(([name, emoji]) => {
     return (
-      <button key={name} className="muted-button reaction-button">
+      <button
+        key={name}
+        type="button"
+        className="muted-button reaction-button"
+        onClick={() =>
+          dispatch(reactionAdded({ postId: post.id, reaction: name }))
+        }
+      >
         {emoji} {post.reactions[name]}
       </button>
     )
