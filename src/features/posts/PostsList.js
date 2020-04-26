@@ -26,7 +26,10 @@ export const PostsList = () => {
   const posts = useSelector((state) => state.posts)
   const dispatch = useDispatch()
 
-  const orderedPosts = posts.slice().reverse()
+  // Sort posts in reverse chronological order by datetime string
+  const orderedPosts = posts
+    .slice()
+    .sort((a, b) => b.date.localeCompare(a.date))
 
   useEffect(() => {
     dispatch(fetchPosts())
