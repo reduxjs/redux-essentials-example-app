@@ -122,7 +122,7 @@ new Server({
         return sentence()
       },
       date() {
-        return faker.date.past(3)
+        return faker.date.recent(7)
       },
       content() {
         return article(1)

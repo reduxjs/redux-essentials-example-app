@@ -25,7 +25,7 @@ export const NotificationsList = () => {
         <div>
           <b>{notification.user}</b> {notification.message}
         </div>
-        <div className={styles.date}>
+        <div className={styles.date} title={notification.date}>
           <i>{timeAgo} ago</i>
         </div>
       </div>

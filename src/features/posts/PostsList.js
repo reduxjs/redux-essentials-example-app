@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { parseISO, formatDistanceToNow } from 'date-fns'
 import { selectUserById } from '../users/usersSlice'
 
 import { fetchPosts, reactionAdded, selectAllPosts } from './postsSlice'
@@ -31,14 +32,16 @@ const PostExcerpt = ({ post }) => {
       </button>
     )
   })
+  const date = parseISO(post.date)
+  const timeAgo = formatDistanceToNow(date)
 
   return (
     <article className="post-excerpt">
       <h3>{post.title}</h3>
-      <span>
-        <i>{author.name}</i>
+      <span>{author.name}</span>
+      <span title={post.date}>
+        &nbsp; <i>{timeAgo} ago</i>
       </span>
-      <span> at {post.date}</span>
       <p>{post.content.substring(0, 100)}</p>
       <div>{reactionButtons}</div>
       <Link to={`/posts/${post.id}`} className="button">
