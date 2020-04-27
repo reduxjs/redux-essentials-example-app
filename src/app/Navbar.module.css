@@ -7,6 +7,10 @@
   margin-left: 5px;
 }
 
+.navLinks {
+  display: flex;
+}
+
 .navLinks :first-child {
   margin-left: 0;
 }

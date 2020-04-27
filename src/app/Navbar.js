@@ -25,12 +25,8 @@ export const Navbar = () => {
 
         <div className={styles.navContent}>
           <div className={styles.navLinks}>
-            <Link to="/" className="button">
-              Posts
-            </Link>
-            <Link to="/addPost" className="button">
-              Add New Post
-            </Link>
+            <Link to="/">Posts</Link>
+            <Link to="/addPost">Add New Post</Link>
           </div>
           <div>Posts: {totalPosts}</div>
         </div>

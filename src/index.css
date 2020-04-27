@@ -37,8 +37,10 @@ nav section {
 
 nav a {
   font-weight: 700;
-  padding: 1rem 1.5rem;
+  padding: 0.25rem 1.5rem;
   border-radius: 4px;
+  color: white;
+  background: #481499;
 }
 
 nav a:first-of-type {
@@ -46,7 +48,8 @@ nav a:first-of-type {
 }
 
 nav a:hover {
-  background: gray;
+  color: white;
+  background: #926bcf;
 }
 
 a {
