@@ -4,8 +4,10 @@ import { Link } from 'react-router-dom'
 
 import styles from './Navbar.module.css'
 
+import { selectAllPosts } from '../features/posts/postsSlice'
+
 export const Navbar = () => {
-  const totalPosts = useSelector((state) => state.posts.length)
+  const totalPosts = useSelector((state) => selectAllPosts(state).length)
   /*
   const totalComments = useSelector((state) => {
     let numComments = 0

@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { selectUserById } from '../users/usersSlice'
 
-import { fetchPosts, reactionAdded } from './postsSlice'
+import { fetchPosts, reactionAdded, selectAllPosts } from './postsSlice'
 
 const reactionEmoji = {
   thumbsUp: '👍',
@@ -49,7 +49,7 @@ const PostExcerpt = ({ post }) => {
 }
 
 export const PostsList = () => {
-  const posts = useSelector((state) => state.posts)
+  const posts = useSelector(selectAllPosts)
   const dispatch = useDispatch()
 
   // Sort posts in reverse chronological order by datetime string
