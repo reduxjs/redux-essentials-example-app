@@ -50,6 +50,8 @@ const PostExcerpt = ({ post }) => {
 
 export const PostsList = () => {
   const posts = useSelector(selectAllPosts)
+  const status = useSelector((state) => state.posts.status)
+  const error = useSelector((state) => state.posts.error)
   const dispatch = useDispatch()
 
   // Sort posts in reverse chronological order by datetime string
@@ -58,17 +60,28 @@ export const PostsList = () => {
     .sort((a, b) => b.date.localeCompare(a.date))
 
   useEffect(() => {
-    dispatch(fetchPosts())
-  }, [dispatch])
+    if (status === 'idle') {
+      dispatch(fetchPosts())
+    }
+  }, [status, dispatch])
 
-  const renderedPosts = orderedPosts.map((post) => (
-    <PostExcerpt key={post.id} post={post} />
-  ))
+  let content
+
+  if (status === 'loading') {
+    content = <div className="loader">Loading...</div>
+  } else if (status === 'succeeded') {
+    content = orderedPosts.map((post) => (
+      <PostExcerpt key={post.id} post={post} />
+    ))
+  } else if (status === 'error') {
+    content = <div>{error}</div>
+  }
 
   return (
     <section>
       <h2>Posts</h2>
-      {renderedPosts}
+
+      {content}
     </section>
   )
 }

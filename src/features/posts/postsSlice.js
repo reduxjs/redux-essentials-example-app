@@ -4,11 +4,15 @@ import { client } from '../../api/client'
 
 const postsSlice = createSlice({
   name: 'posts',
-  initialState: [],
+  initialState: {
+    status: 'idle',
+    posts: [],
+    error: null,
+  },
   reducers: {
     postAdded: {
       reducer(state, action) {
-        state.push(action.payload)
+        state.posts.push(action.payload)
       },
       prepare(title, content, userId) {
         return {
@@ -29,12 +33,27 @@ const postsSlice = createSlice({
         }
       },
     },
+    postsLoading(state, action) {
+      if (state.status === 'idle') {
+        state.status = 'loading'
+        state.error = null
+      }
+    },
     postsLoaded(state, action) {
-      return action.payload
+      if (state.status === 'loading') {
+        state.posts = action.payload
+        state.status = 'succeeded'
+      }
+    },
+    loadingFailed(state, action) {
+      if (state.status === 'loading') {
+        state.status = 'failed'
+        state.error = action.payload
+      }
     },
     postUpdated(state, action) {
       const { id, title, content } = action.payload
-      const existingPost = state.find((post) => post.id === id)
+      const existingPost = state.posts.find((post) => post.id === id)
       if (existingPost) {
         existingPost.title = title
         existingPost.content = content
@@ -42,7 +61,7 @@ const postsSlice = createSlice({
     },
     reactionAdded(state, action) {
       const { postId, reaction } = action.payload
-      const existingPost = state.find((post) => post.id === postId)
+      const existingPost = state.posts.find((post) => post.id === postId)
       if (existingPost) {
         existingPost.reactions[reaction]++
       }
@@ -52,7 +71,9 @@ const postsSlice = createSlice({
 
 export const {
   postAdded,
+  postsLoading,
   postsLoaded,
+  loadingFailed,
   postUpdated,
   reactionAdded,
 } = postsSlice.actions
@@ -60,6 +81,13 @@ export const {
 export default postsSlice.reducer
 
 export const fetchPosts = () => async (dispatch) => {
-  const response = await client.get('/fakeApi/posts')
-  dispatch(postsLoaded(response.posts))
+  try {
+    dispatch(postsLoading())
+    const response = await client.get('/fakeApi/posts')
+    dispatch(postsLoaded(response.posts))
+  } catch (err) {
+    dispatch(loadingFailed(err.message))
+  }
 }
+
+export const selectAllPosts = (state) => state.posts.posts
