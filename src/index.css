@@ -35,11 +35,12 @@ nav section {
   color: white;
 }
 
-nav a {
+nav a,
+nav a:active {
   font-weight: 700;
   padding: 0.25rem 1.5rem;
   border-radius: 4px;
-  color: white;
+  color: white !important;
   background: #481499;
 }
 
@@ -198,4 +199,18 @@ button.reaction-button {
     -webkit-transform: rotate(360deg);
     transform: rotate(360deg);
   }
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.25em 0.4em;
+  font-size: 75%;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.25rem;
+  color: #212529;
+  background-color: #f8f9fa;
 }

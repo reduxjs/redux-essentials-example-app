@@ -1,13 +1,22 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import styles from './Navbar.module.css'
 
+import { client } from '../api/client'
+
 import { selectAllPosts } from '../features/posts/postsSlice'
+import {
+  fetchNotifications,
+  selectAllNotifications,
+} from '../features/notifications/notificationsSlice'
 
 export const Navbar = () => {
   const totalPosts = useSelector((state) => selectAllPosts(state).length)
+  const notifications = useSelector(selectAllNotifications)
+  const numUnreadNotifications = notifications.filter((n) => !n.read).length
+  const dispatch = useDispatch()
   /*
   const totalComments = useSelector((state) => {
     let numComments = 0
@@ -17,6 +26,17 @@ export const Navbar = () => {
     return numComments
   })
   */
+  const fetchNewNotifications = () => {
+    dispatch(fetchNotifications())
+  }
+
+  let unreadNotificationsBadge
+
+  if (numUnreadNotifications > 0) {
+    unreadNotificationsBadge = (
+      <span className="badge">{numUnreadNotifications}</span>
+    )
+  }
 
   return (
     <nav>
@@ -27,7 +47,14 @@ export const Navbar = () => {
           <div className={styles.navLinks}>
             <Link to="/">Posts</Link>
             <Link to="/addPost">Add New Post</Link>
+            <Link to="/notifications">
+              Notifications
+              {unreadNotificationsBadge}
+            </Link>
           </div>
+          <button className="button" onClick={fetchNewNotifications}>
+            Refresh Notifications
+          </button>
           <div>Posts: {totalPosts}</div>
         </div>
       </section>

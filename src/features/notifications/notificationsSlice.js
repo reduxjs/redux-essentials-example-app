@@ -19,6 +19,11 @@ const notificationsAdapter = createEntityAdapter({
   sortComparer: (a, b) => b.date.localeCompare(a.date),
 })
 
+export const {
+  selectAll: selectAllNotifications,
+  selectById: selectNotificationById,
+} = notificationsAdapter.getSelectors((state) => state.notifications)
+
 const notificationsSlice = createSlice({
   name: 'notifications',
   initialState: notificationsAdapter.getInitialState(),

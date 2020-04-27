@@ -7,6 +7,12 @@
   margin-left: 5px;
 }
 
+.navLinks a :global(.badge) {
+  margin-left: 5px;
+  position: relative;
+  top: -3px;
+}
+
 .navLinks {
   display: flex;
 }
