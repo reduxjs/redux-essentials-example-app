@@ -5,6 +5,7 @@ import { parseISO, formatDistanceToNow } from 'date-fns'
 
 import { selectUserById } from '../users/usersSlice'
 import { selectPostById } from '../posts/postsSlice'
+import { ReactionButtons } from './ReactionButtons'
 
 export const SinglePostPage = ({ match }) => {
   const { postId } = match.params
@@ -37,6 +38,7 @@ export const SinglePostPage = ({ match }) => {
           &nbsp; <i>{timeAgo} ago</i>
         </span>
         <p>{post.content}</p>
+        <ReactionButtons post={post} />
         <Link to={`/editPost/${post.id}`} className="button">
           Edit Post
         </Link>

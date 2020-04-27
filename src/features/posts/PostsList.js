@@ -6,32 +6,12 @@ import { selectUserById } from '../users/usersSlice'
 
 import { fetchPosts, reactionAdded, selectAllPosts } from './postsSlice'
 
-const reactionEmoji = {
-  thumbsUp: '👍',
-  hooray: '🎉',
-  heart: '❤️',
-  rocket: '🚀',
-  eyes: '👀',
-}
+import { ReactionButtons } from './ReactionButtons'
 
 const PostExcerpt = ({ post }) => {
   const author = useSelector((state) => selectUserById(state, post.user))
   const dispatch = useDispatch()
 
-  const reactionButtons = Object.entries(reactionEmoji).map(([name, emoji]) => {
-    return (
-      <button
-        key={name}
-        type="button"
-        className="muted-button reaction-button"
-        onClick={() =>
-          dispatch(reactionAdded({ postId: post.id, reaction: name }))
-        }
-      >
-        {emoji} {post.reactions[name]}
-      </button>
-    )
-  })
   const date = parseISO(post.date)
   const timeAgo = formatDistanceToNow(date)
 
@@ -43,7 +23,7 @@ const PostExcerpt = ({ post }) => {
         &nbsp; <i>{timeAgo} ago</i>
       </span>
       <p>{post.content.substring(0, 100)}</p>
-      <div>{reactionButtons}</div>
+      <ReactionButtons post={post} />
       <Link to={`/posts/${post.id}`} className="button">
         View Post
       </Link>
