@@ -3,13 +3,12 @@ import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import { selectUserById } from '../users/usersSlice'
+import { selectPostById } from '../posts/postsSlice'
 
 export const SinglePostPage = ({ match }) => {
   const { postId } = match.params
 
-  const post = useSelector((state) =>
-    state.posts.find((post) => post.id === postId)
-  )
+  const post = useSelector((state) => selectPostById(state, postId))
 
   const author = useSelector((state) =>
     selectUserById(state, post ? post.user : null)

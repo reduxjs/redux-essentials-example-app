@@ -1,4 +1,9 @@
-import { createSlice, nanoid, createAsyncThunk } from '@reduxjs/toolkit'
+import {
+  createSlice,
+  nanoid,
+  createAsyncThunk,
+  createEntityAdapter,
+} from '@reduxjs/toolkit'
 
 import { client } from '../../api/client'
 
@@ -7,18 +12,25 @@ export const fetchPosts = createAsyncThunk('posts/fetchPosts', async () => {
   return response.posts
 })
 
+const postsAdapter = createEntityAdapter({
+  // Sort chronologically
+  sortComparer: (a, b) => a.date.localeCompare(b.date),
+})
+
+export const {
+  selectAll: selectAllPosts,
+  selectById: selectPostById,
+} = postsAdapter.getSelectors((state) => state.posts)
+
 const postsSlice = createSlice({
   name: 'posts',
-  initialState: {
+  initialState: postsAdapter.getInitialState({
     status: 'idle',
-    posts: [],
     error: null,
-  },
+  }),
   reducers: {
     postAdded: {
-      reducer(state, action) {
-        state.posts.push(action.payload)
-      },
+      reducer: postsAdapter.addOne,
       prepare(title, content, userId) {
         return {
           payload: {
@@ -40,15 +52,11 @@ const postsSlice = createSlice({
     },
     postUpdated(state, action) {
       const { id, title, content } = action.payload
-      const existingPost = state.posts.find((post) => post.id === id)
-      if (existingPost) {
-        existingPost.title = title
-        existingPost.content = content
-      }
+      postsAdapter.updateOne(state, { id, changes: { title, content } })
     },
     reactionAdded(state, action) {
       const { postId, reaction } = action.payload
-      const existingPost = state.posts.find((post) => post.id === postId)
+      const existingPost = state.entities[postId]
       if (existingPost) {
         existingPost.reactions[reaction]++
       }
@@ -63,7 +71,7 @@ const postsSlice = createSlice({
     },
     [fetchPosts.fulfilled]: (state, action) => {
       if (state.status === 'loading') {
-        state.posts = action.payload
+        postsAdapter.upsertMany(state, action)
         state.status = 'succeeded'
       }
     },
@@ -84,5 +92,3 @@ export const {
 } = postsSlice.actions
 
 export default postsSlice.reducer
-
-export const selectAllPosts = (state) => state.posts.posts

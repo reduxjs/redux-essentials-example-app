@@ -54,10 +54,8 @@ export const PostsList = () => {
   const error = useSelector((state) => state.posts.error)
   const dispatch = useDispatch()
 
-  // Sort posts in reverse chronological order by datetime string
-  const orderedPosts = posts
-    .slice()
-    .sort((a, b) => b.date.localeCompare(a.date))
+  // Sort posts in reverse chronological order
+  const orderedPosts = posts.slice().reverse()
 
   useEffect(() => {
     if (status === 'idle') {
