@@ -8,8 +8,12 @@ import { client } from '../../api/client'
 
 export const fetchNotifications = createAsyncThunk(
   'notifications/fetchNotifications',
-  async () => {
-    const response = await client.get('/fakeApi/notifications')
+  async (_, { getState }) => {
+    const [latestNotification] = selectAllNotifications(getState())
+    const latestTimestamp = latestNotification ? latestNotification.date : ''
+    const response = await client.get(
+      `/fakeApi/notifications?since=${latestTimestamp}`
+    )
     return response.notifications
   }
 )

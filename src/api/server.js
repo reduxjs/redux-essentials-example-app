@@ -12,6 +12,7 @@ import { nanoid } from '@reduxjs/toolkit'
 
 import faker from 'faker'
 import { sentence, paragraph, article } from 'txtgen'
+import { parseISO } from 'date-fns'
 
 const IdSerializer = RestSerializer.extend({
   serializeIds: 'always',
@@ -58,18 +59,26 @@ new Server({
     })
 
     this.get('/notifications', (schema, req) => {
+      console.log(req)
       const numNotifications = 3
 
+      let pastDate
+
       const now = new Date()
-      const past = new Date(now.valueOf())
-      past.setMinutes(past.getMinutes() - 15)
+
+      if (req.queryParams.since) {
+        pastDate = parseISO(req.queryParams.since)
+      } else {
+        pastDate = new Date(now.valueOf())
+        pastDate.setMinutes(pastDate.getMinutes() - 15)
+      }
 
       const notifications = [...Array(numNotifications)].map(() => {
         const user = randomFromArray(schema.db.users)
         const template = randomFromArray(notificationTemplates)
         return {
           id: nanoid(),
-          date: faker.date.between(past, now).toISOString(),
+          date: faker.date.between(pastDate, now).toISOString(),
           message: template,
           user: user.name,
           read: false,
