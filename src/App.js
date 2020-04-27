@@ -29,7 +29,6 @@ function App() {
               </React.Fragment>
             )}
           />
-          <Route exact path="/addPost" component={AddPostForm} />
           <Route exact path="/posts/:postId" component={SinglePostPage} />
           <Route exact path="/editPost/:postId" component={EditPostForm} />
           <Route exact path="/notifications" component={NotificationsList} />
