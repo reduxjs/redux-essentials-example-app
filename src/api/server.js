@@ -17,6 +17,24 @@ const IdSerializer = RestSerializer.extend({
   serializeIds: 'always',
 })
 
+function getRandomInt(min, max) {
+  min = Math.ceil(min)
+  max = Math.floor(max)
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+const randomFromArray = (array) => {
+  const index = getRandomInt(0, array.length - 1)
+  return array[index]
+}
+
+const notificationTemplates = [
+  'poked you',
+  'says hi!',
+  `is glad we're friends`,
+  'sent you a gift',
+]
+
 new Server({
   routes() {
     this.namespace = 'fakeApi'
@@ -38,6 +56,27 @@ new Server({
       const post = schema.posts.find(req.params.postId)
       return post.comments
     })
+
+    this.get('/notifications', (schema, req) => {
+      const numNotifications = 3
+
+      const now = new Date()
+      const past = new Date(now.valueOf())
+      past.setMinutes(past.getMinutes() - 15)
+
+      const notifications = [...Array(numNotifications)].map(() => {
+        const user = randomFromArray(schema.db.users)
+        const template = randomFromArray(notificationTemplates)
+        return {
+          id: nanoid(),
+          date: faker.date.between(past, now).toISOString(),
+          message: `${user.name} ${template}`,
+          read: false,
+        }
+      })
+
+      return { notifications }
+    })
   },
   models: {
     user: Model.extend({
@@ -50,6 +89,7 @@ new Server({
     comment: Model.extend({
       post: belongsTo(),
     }),
+    notification: Model.extend({}),
   },
   factories: {
     user: Factory.extend({
