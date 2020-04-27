@@ -1,6 +1,11 @@
-import { createSlice, nanoid } from '@reduxjs/toolkit'
+import { createSlice, nanoid, createAsyncThunk } from '@reduxjs/toolkit'
 
 import { client } from '../../api/client'
+
+export const fetchPosts = createAsyncThunk('posts/fetchPosts', async () => {
+  const response = await client.get('/fakeApi/posts')
+  return response.posts
+})
 
 const postsSlice = createSlice({
   name: 'posts',
@@ -33,24 +38,6 @@ const postsSlice = createSlice({
         }
       },
     },
-    postsLoading(state, action) {
-      if (state.status === 'idle') {
-        state.status = 'loading'
-        state.error = null
-      }
-    },
-    postsLoaded(state, action) {
-      if (state.status === 'loading') {
-        state.posts = action.payload
-        state.status = 'succeeded'
-      }
-    },
-    loadingFailed(state, action) {
-      if (state.status === 'loading') {
-        state.status = 'failed'
-        state.error = action.payload
-      }
-    },
     postUpdated(state, action) {
       const { id, title, content } = action.payload
       const existingPost = state.posts.find((post) => post.id === id)
@@ -67,27 +54,35 @@ const postsSlice = createSlice({
       }
     },
   },
+  extraReducers: {
+    [fetchPosts.pending]: (state, action) => {
+      if (state.status === 'idle') {
+        state.status = 'loading'
+        state.error = null
+      }
+    },
+    [fetchPosts.fulfilled]: (state, action) => {
+      if (state.status === 'loading') {
+        state.posts = action.payload
+        state.status = 'succeeded'
+      }
+    },
+    [fetchPosts.rejected]: (state, action) => {
+      if (state.status === 'loading') {
+        state.status = 'failed'
+        state.error = action.payload
+      }
+    },
+  },
 })
 
 export const {
   postAdded,
-  postsLoading,
   postsLoaded,
-  loadingFailed,
   postUpdated,
   reactionAdded,
 } = postsSlice.actions
 
 export default postsSlice.reducer
-
-export const fetchPosts = () => async (dispatch) => {
-  try {
-    dispatch(postsLoading())
-    const response = await client.get('/fakeApi/posts')
-    dispatch(postsLoaded(response.posts))
-  } catch (err) {
-    dispatch(loadingFailed(err.message))
-  }
-}
 
 export const selectAllPosts = (state) => state.posts.posts
