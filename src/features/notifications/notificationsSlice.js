@@ -37,15 +37,15 @@ const notificationsSlice = createSlice({
         notification.read = true
       })
     },
-    notificationRead(state, action) {
-      const notification = state.entities[action.payload]
-      if (notification) {
-        notification.read = true
-      }
-    },
   },
   extraReducers: {
-    [fetchNotifications.fulfilled]: notificationsAdapter.upsertMany,
+    [fetchNotifications.fulfilled]: (state, action) => {
+      Object.values(state.entities).forEach((notification) => {
+        notification.isNew = !notification.read
+      })
+
+      notificationsAdapter.upsertMany(state, action)
+    },
   },
 })
 

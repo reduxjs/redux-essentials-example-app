@@ -19,6 +19,7 @@ const usersSelectors = usersAdapter.getSelectors((state) => state.users)
 
 export const {
   selectAll: selectAllUsers,
+  selectEntities: selectUserEntities,
   selectById: selectUserById,
 } = usersSelectors
 

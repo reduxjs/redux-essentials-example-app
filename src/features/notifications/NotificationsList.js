@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { formatDistanceToNow, parseISO } from 'date-fns'
+import classnames from 'classnames'
+
+import { selectUserEntities } from '../users/usersSlice'
 
 import styles from './NotificationsList.module.css'
 
@@ -11,6 +14,7 @@ import {
 
 export const NotificationsList = () => {
   const notifications = useSelector(selectAllNotifications)
+  const usersById = useSelector(selectUserEntities)
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -20,10 +24,16 @@ export const NotificationsList = () => {
   const renderedNotifications = notifications.map((notification) => {
     const date = parseISO(notification.date)
     const timeAgo = formatDistanceToNow(date)
+    const user = usersById[notification.user] || {}
+
+    const notificationClassname = classnames(styles.notification, {
+      [styles.new]: notification.isNew,
+    })
+
     return (
-      <div key={notification.id} className={styles.notification}>
+      <div key={notification.id} className={notificationClassname}>
         <div>
-          <b>{notification.user}</b> {notification.message}
+          <b>{user.name}</b> {notification.message}
         </div>
         <div className={styles.date} title={notification.date}>
           <i>{timeAgo} ago</i>

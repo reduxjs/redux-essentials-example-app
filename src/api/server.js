@@ -79,8 +79,9 @@ new Server({
           id: nanoid(),
           date: faker.date.between(pastDate, now).toISOString(),
           message: template,
-          user: user.name,
+          user: user.id,
           read: false,
+          isNew: true,
         }
       })
 
