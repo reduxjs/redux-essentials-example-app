@@ -59,8 +59,7 @@ new Server({
     })
 
     this.get('/notifications', (schema, req) => {
-      console.log(req)
-      const numNotifications = 3
+      const numNotifications = getRandomInt(1, 5)
 
       let pastDate
 
