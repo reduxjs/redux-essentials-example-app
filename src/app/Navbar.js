@@ -46,6 +46,7 @@ export const Navbar = () => {
         <div className={styles.navContent}>
           <div className={styles.navLinks}>
             <Link to="/">Posts</Link>
+            <Link to="/users">Users</Link>
             <Link to="/notifications">
               Notifications
               {unreadNotificationsBadge}
