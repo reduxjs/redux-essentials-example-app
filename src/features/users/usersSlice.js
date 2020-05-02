@@ -7,9 +7,7 @@ const usersSlice = createSlice({
   name: 'users',
   initialState: usersAdapter.getInitialState(),
   reducers: {
-    usersLoaded(state, action) {
-      usersAdapter.setAll(state, action.payload)
-    },
+    usersLoaded: usersAdapter.setAll,
   },
 })
 

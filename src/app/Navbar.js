@@ -4,8 +4,6 @@ import { Link } from 'react-router-dom'
 
 import styles from './Navbar.module.css'
 
-import { client } from '../api/client'
-
 import { selectAllPosts, reloadAllPosts } from '../features/posts/postsSlice'
 import {
   fetchNotifications,
@@ -17,15 +15,7 @@ export const Navbar = () => {
   const notifications = useSelector(selectAllNotifications)
   const numUnreadNotifications = notifications.filter((n) => !n.read).length
   const dispatch = useDispatch()
-  /*
-  const totalComments = useSelector((state) => {
-    let numComments = 0
-    state.posts.forEach((post) => {
-      numComments += post.commentIds.length
-    })
-    return numComments
-  })
-  */
+
   const fetchNewNotifications = () => {
     dispatch(fetchNotifications())
   }

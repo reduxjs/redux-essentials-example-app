@@ -4,13 +4,12 @@ import { Link } from 'react-router-dom'
 import { parseISO, formatDistanceToNow } from 'date-fns'
 import { selectUserById } from '../users/usersSlice'
 
-import { fetchPosts, reactionAdded, selectAllPosts } from './postsSlice'
+import { fetchPosts, selectAllPosts } from './postsSlice'
 
 import { ReactionButtons } from './ReactionButtons'
 
 const PostExcerpt = ({ post }) => {
   const author = useSelector((state) => selectUserById(state, post.user))
-  const dispatch = useDispatch()
 
   const date = parseISO(post.date)
   const timeAgo = formatDistanceToNow(date)
