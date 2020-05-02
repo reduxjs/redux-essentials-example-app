@@ -49,6 +49,10 @@ new Server({
 
     this.post('/posts', function (schema, req) {
       const data = this.normalizedRequestAttrs()
+      data.date = new Date().toISOString()
+      if (data.content === 'error') {
+        throw new Error('Could not save the post!')
+      }
       const result = server.create('post', data)
       return result
     })
