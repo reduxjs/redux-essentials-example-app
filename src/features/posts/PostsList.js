@@ -18,7 +18,7 @@ const PostExcerpt = ({ post }) => {
   return (
     <article className="post-excerpt">
       <h3>{post.title}</h3>
-      <span>{author.name}</span>
+      <span>{author ? author.name : 'Unknown author!'}</span>
       <span title={post.date}>
         &nbsp; <i>{timeAgo} ago</i>
       </span>

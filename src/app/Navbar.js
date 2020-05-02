@@ -6,7 +6,7 @@ import styles from './Navbar.module.css'
 
 import { client } from '../api/client'
 
-import { selectAllPosts } from '../features/posts/postsSlice'
+import { selectAllPosts, reloadAllPosts } from '../features/posts/postsSlice'
 import {
   fetchNotifications,
   selectAllNotifications,
@@ -28,6 +28,10 @@ export const Navbar = () => {
   */
   const fetchNewNotifications = () => {
     dispatch(fetchNotifications())
+  }
+
+  const refreshPosts = () => {
+    dispatch(reloadAllPosts())
   }
 
   let unreadNotificationsBadge
@@ -52,10 +56,12 @@ export const Navbar = () => {
               {unreadNotificationsBadge}
             </Link>
           </div>
+          <button className="button" onClick={refreshPosts}>
+            Refresh Posts
+          </button>
           <button className="button" onClick={fetchNewNotifications}>
             Refresh Notifications
           </button>
-          <div>Posts: {totalPosts}</div>
         </div>
       </section>
     </nav>

@@ -41,6 +41,7 @@ const postsSlice = createSlice({
       const { id, title, content } = action.payload
       postsAdapter.updateOne(state, { id, changes: { title, content } })
     },
+    postsCleared: postsAdapter.removeAll,
     reactionAdded(state, action) {
       const { postId, reaction } = action.payload
       const existingPost = state.entities[postId]
@@ -51,10 +52,8 @@ const postsSlice = createSlice({
   },
   extraReducers: {
     [fetchPosts.pending]: (state, action) => {
-      if (state.status === 'idle') {
-        state.status = 'loading'
-        state.error = null
-      }
+      state.status = 'loading'
+      state.error = null
     },
     [fetchPosts.fulfilled]: (state, action) => {
       if (state.status === 'loading') {
@@ -73,10 +72,15 @@ const postsSlice = createSlice({
 })
 
 export const {
-  postAdded,
   postsLoaded,
   postUpdated,
   reactionAdded,
+  postsCleared,
 } = postsSlice.actions
 
 export default postsSlice.reducer
+
+export const reloadAllPosts = () => async (dispatch) => {
+  dispatch(postsCleared())
+  dispatch(fetchPosts())
+}
