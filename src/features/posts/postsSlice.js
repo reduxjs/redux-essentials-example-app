@@ -12,6 +12,14 @@ export const fetchPosts = createAsyncThunk('posts/fetchPosts', async () => {
   return response.posts
 })
 
+export const addNewPost = createAsyncThunk(
+  'posts/addNewPost',
+  async (initialPost) => {
+    const response = await client.post('/fakeApi/posts', { post: initialPost })
+    return response.post
+  }
+)
+
 const postsAdapter = createEntityAdapter({
   // Sort chronologically
   sortComparer: (a, b) => a.date.localeCompare(b.date),
@@ -29,27 +37,6 @@ const postsSlice = createSlice({
     error: null,
   }),
   reducers: {
-    postAdded: {
-      reducer: postsAdapter.addOne,
-      prepare(title, content, userId) {
-        return {
-          payload: {
-            id: nanoid(),
-            date: new Date().toISOString(),
-            title,
-            content,
-            user: userId,
-            reactions: {
-              thumbsUp: 0,
-              hooray: 0,
-              heart: 0,
-              rocket: 0,
-              eyes: 0,
-            },
-          },
-        }
-      },
-    },
     postUpdated(state, action) {
       const { id, title, content } = action.payload
       postsAdapter.updateOne(state, { id, changes: { title, content } })
@@ -81,6 +68,7 @@ const postsSlice = createSlice({
         state.error = action.payload
       }
     },
+    [addNewPost.fulfilled]: postsAdapter.addOne,
   },
 })
 
