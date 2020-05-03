@@ -27,6 +27,7 @@ const postsAdapter = createEntityAdapter({
 
 export const {
   selectAll: selectAllPosts,
+  selectIds: selectPostIds,
   selectById: selectPostById,
 } = postsAdapter.getSelectors((state) => state.posts)
 

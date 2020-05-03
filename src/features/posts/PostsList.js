@@ -4,11 +4,17 @@ import { Link } from 'react-router-dom'
 import { parseISO, formatDistanceToNow } from 'date-fns'
 import { selectUserById } from '../users/usersSlice'
 
-import { fetchPosts, selectAllPosts } from './postsSlice'
+import {
+  fetchPosts,
+  selectAllPosts,
+  selectPostIds,
+  selectPostById,
+} from './postsSlice'
 
 import { ReactionButtons } from './ReactionButtons'
 
-const PostExcerpt = ({ post }) => {
+const PostExcerpt = ({ postId }) => {
+  const post = useSelector((state) => selectPostById(state, postId))
   const author = useSelector((state) => selectUserById(state, post.user))
 
   const date = parseISO(post.date)
@@ -31,13 +37,13 @@ const PostExcerpt = ({ post }) => {
 }
 
 export const PostsList = () => {
-  const posts = useSelector(selectAllPosts)
+  const postIds = useSelector(selectPostIds)
   const status = useSelector((state) => state.posts.status)
   const error = useSelector((state) => state.posts.error)
   const dispatch = useDispatch()
 
   // Sort posts in reverse chronological order
-  const orderedPosts = posts.slice().reverse()
+  const orderedPostIds = postIds.slice().reverse()
 
   useEffect(() => {
     if (status === 'idle') {
@@ -50,8 +56,8 @@ export const PostsList = () => {
   if (status === 'loading') {
     content = <div className="loader">Loading...</div>
   } else if (status === 'succeeded') {
-    content = orderedPosts.map((post) => (
-      <PostExcerpt key={post.id} post={post} />
+    content = orderedPostIds.map((postId) => (
+      <PostExcerpt key={postId} postId={postId} />
     ))
   } else if (status === 'error') {
     content = <div>{error}</div>
