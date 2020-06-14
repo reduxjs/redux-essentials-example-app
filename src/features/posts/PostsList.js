@@ -7,6 +7,24 @@ import { TimeAgo } from './TimeAgo'
 import { ReactionButtons } from './ReactionButtons'
 import { selectAllPosts } from './postsSlice'
 
+const PostExcerpt = ({ post }) => {
+  return (
+    <article className="post-excerpt" key={post.id}>
+      <h3>{post.title}</h3>
+      <div>
+        <PostAuthor userId={post.user} />
+        <TimeAgo timestamp={post.date} />
+      </div>
+      <p className="post-content">{post.content.substring(0, 100)}</p>
+
+      <ReactionButtons post={post} />
+      <Link to={`/posts/${post.id}`} className="button muted-button">
+        View Post
+      </Link>
+    </article>
+  )
+}
+
 export const PostsList = () => {
   const posts = useSelector(selectAllPosts)
 
@@ -15,23 +33,9 @@ export const PostsList = () => {
     .slice()
     .sort((a, b) => b.date.localeCompare(a.date))
 
-  const renderedPosts = orderedPosts.map((post) => {
-    return (
-      <article className="post-excerpt" key={post.id}>
-        <h3>{post.title}</h3>
-        <div>
-          <PostAuthor userId={post.user} />
-          <TimeAgo timestamp={post.date} />
-        </div>
-        <p className="post-content">{post.content.substring(0, 100)}</p>
-
-        <ReactionButtons post={post} />
-        <Link to={`/posts/${post.id}`} className="button muted-button">
-          View Post
-        </Link>
-      </article>
-    )
-  })
+  const renderedPosts = orderedPosts.map((post) => (
+    <PostExcerpt key={post.id} post={post} />
+  ))
 
   return (
     <section className="posts-list">
