@@ -157,7 +157,6 @@ new Server({
       username() {
         return faker.internet.userName(this.firstName, this.lastName)
       },
-
       afterCreate(user, server) {
         server.createList('post', 3, { user })
       },
