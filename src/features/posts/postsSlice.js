@@ -48,20 +48,21 @@ const postsSlice = createSlice({
       }
     },
   },
-  extraReducers: {
-    [fetchPosts.pending]: (state, action) => {
-      state.status = 'loading'
-    },
-    [fetchPosts.fulfilled]: (state, action) => {
-      state.status = 'succeeded'
-      // Add any fetched posts to the array
-      postsAdapter.upsertMany(state, action.payload)
-    },
-    [fetchPosts.rejected]: (state, action) => {
-      state.status = 'failed'
-      state.error = action.error.message
-    },
-    [addNewPost.fulfilled]: postsAdapter.addOne,
+  extraReducers(builder) {
+    builder
+      .addCase(fetchPosts.pending, (state, action) => {
+        state.status = 'loading'
+      })
+      .addCase(fetchPosts.fulfilled, (state, action) => {
+        state.status = 'succeeded'
+        // Add any fetched posts to the array
+        postsAdapter.upsertMany(state, action.payload)
+      })
+      .addCase(fetchPosts.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error = action.error.message
+      })
+      .addCase(addNewPost.fulfilled, postsAdapter.addOne)
   },
 })
 
