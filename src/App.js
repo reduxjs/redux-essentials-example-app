@@ -1,13 +1,14 @@
-import React from 'react'
+import React from "react";
 import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Redirect,
-} from 'react-router-dom'
+  Redirect
+} from "react-router-dom";
 
-import { Navbar } from './app/Navbar'
+import { Navbar } from "./app/Navbar";
 
+import { PostsList } from "./features/posts/PostsList";
 function App() {
   return (
     <Router>
@@ -19,7 +20,9 @@ function App() {
             path="/"
             render={() => (
               <section>
-                <h2>Welcome to the Redux Essentials example app!</h2>
+                <>
+                  <PostsList />
+                </>
               </section>
             )}
           />
@@ -27,7 +30,7 @@ function App() {
         </Switch>
       </div>
     </Router>
-  )
+  );
 }
 
-export default App
+export default App;
