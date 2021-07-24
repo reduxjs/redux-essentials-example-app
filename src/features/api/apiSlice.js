@@ -19,7 +19,15 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Posts'],
     }),
+    getUsers: builder.query({
+      query: () => '/users',
+      transformResponse: (res) => res.users,
+    }),
   }),
 })
 
-export const { useGetPostsQuery, useEditPostMutation } = apiSlice
+export const {
+  useGetPostsQuery,
+  useEditPostMutation,
+  useGetUsersQuery,
+} = apiSlice
