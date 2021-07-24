@@ -98,6 +98,14 @@ new Server({
       return post
     })
 
+    this.post('posts/:postId/reactions', function (schema, req) {
+      const body = JSON.parse(req.requestBody)
+
+      const post = schema.posts.find(req.params.postId)
+      post.reactions[body.reaction]++
+      return post
+    })
+
     this.get('/posts/:postId/comments', (schema, req) => {
       const post = schema.posts.find(req.params.postId)
       return post.comments
