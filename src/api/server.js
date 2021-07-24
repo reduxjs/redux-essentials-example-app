@@ -8,6 +8,8 @@ import {
   RestSerializer,
 } from 'miragejs'
 
+import { Server as MockSocketServer } from 'mock-socket'
+
 import { nanoid } from '@reduxjs/toolkit'
 
 import faker from 'faker'
@@ -62,7 +64,7 @@ const notificationTemplates = [
   'sent you a gift',
 ]
 
-new Server({
+const apiServer = new Server({
   routes() {
     this.namespace = 'fakeApi'
     this.timing = 2000
@@ -114,31 +116,11 @@ new Server({
     this.get('/notifications', (schema, req) => {
       const numNotifications = getRandomInt(1, 5)
 
-      let pastDate
-
-      const now = new Date()
-
-      if (req.queryParams.since) {
-        pastDate = parseISO(req.queryParams.since)
-      } else {
-        pastDate = new Date(now.valueOf())
-        pastDate.setMinutes(pastDate.getMinutes() - 15)
-      }
-
-      // Create N random notifications. We won't bother saving these
-      // in the DB - just generate a new batch and return them.
-      const notifications = [...Array(numNotifications)].map(() => {
-        const user = randomFromArray(schema.db.users)
-        const template = randomFromArray(notificationTemplates)
-        return {
-          id: nanoid(),
-          date: faker.date.between(pastDate, now).toISOString(),
-          message: template,
-          user: user.id,
-          read: false,
-          isNew: true,
-        }
-      })
+      let notifications = generateRandomNotifications(
+        req.queryParams.since,
+        numNotifications,
+        schema
+      )
 
       return { notifications }
     })
@@ -228,3 +210,66 @@ new Server({
     server.createList('user', 3)
   },
 })
+
+const socketServer = new MockSocketServer('ws://localhost')
+
+socketServer.on('connection', (socket) => {
+  const sendMessage = (obj) => {
+    socket.send(JSON.stringify(obj))
+  }
+  socket.on('message', (data) => {
+    const message = JSON.parse(data)
+
+    switch (message.type) {
+      case 'hello': {
+        sendMessage({ type: 'response', payload: 'hi!' })
+        break
+      }
+      case 'notifications': {
+        const since = message.payload
+
+        const numNotifications = getRandomInt(1, 5)
+
+        const notifications = generateRandomNotifications(
+          since,
+          numNotifications,
+          apiServer.schema
+        )
+
+        sendMessage({ type: 'notifications', payload: notifications })
+        break
+      }
+      default:
+        break
+    }
+  })
+})
+
+function generateRandomNotifications(since, numNotifications, schema) {
+  const now = new Date()
+  let pastDate
+
+  if (since) {
+    pastDate = parseISO(since)
+  } else {
+    pastDate = new Date(now.valueOf())
+    pastDate.setMinutes(pastDate.getMinutes() - 15)
+  }
+
+  // Create N random notifications. We won't bother saving these
+  // in the DB - just generate a new batch and return them.
+  const notifications = [...Array(numNotifications)].map(() => {
+    const user = randomFromArray(schema.db.users)
+    const template = randomFromArray(notificationTemplates)
+    return {
+      id: nanoid(),
+      date: faker.date.between(pastDate, now).toISOString(),
+      message: template,
+      user: user.id,
+      read: false,
+      isNew: true,
+    }
+  })
+
+  return notifications
+}
