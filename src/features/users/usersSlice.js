@@ -2,7 +2,18 @@ import { createEntityAdapter, createSelector } from '@reduxjs/toolkit'
 
 import { apiSlice } from '../api/apiSlice'
 
-export const selectUsersResult = apiSlice.endpoints.getUsers.select()
+export const extendedApi = apiSlice.injectEndpoints({
+  endpoints: (builder) => ({
+    getUsers: builder.query({
+      query: () => '/users',
+      transformResponse: (res) => res.users,
+    }),
+  }),
+})
+
+export const { useGetUsersQuery } = extendedApi
+
+export const selectUsersResult = extendedApi.endpoints.getUsers.select()
 
 const emptyUsers = []
 

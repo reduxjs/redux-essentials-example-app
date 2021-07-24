@@ -5,11 +5,11 @@ import App from './App'
 import store from './app/store'
 import { Provider } from 'react-redux'
 
-import { apiSlice } from './features/api/apiSlice'
+import { extendedApi } from './features/users/usersSlice'
 
 import './api/server'
 
-store.dispatch(apiSlice.endpoints.getUsers.initiate())
+store.dispatch(extendedApi.endpoints.getUsers.initiate())
 
 ReactDOM.render(
   <React.StrictMode>
