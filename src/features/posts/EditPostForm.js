@@ -6,8 +6,11 @@ import { useGetPostsQuery, useEditPostMutation } from '../api/apiSlice'
 export const EditPostForm = ({ match }) => {
   const { postId } = match.params
 
-  const post = useGetPostsQuery(undefined, {
-    selectFromResult: (res) => res.data.find((post) => post.id === postId),
+  const { post } = useGetPostsQuery(undefined, {
+    selectFromResult: (res) => ({
+      ...res,
+      post: res.data.find((post) => post.id === postId),
+    }),
   })
 
   const [updatePost] = useEditPostMutation()

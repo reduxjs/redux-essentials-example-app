@@ -10,8 +10,11 @@ import { useGetPostsQuery } from '../api/apiSlice'
 export const SinglePostPage = ({ match }) => {
   const { postId } = match.params
 
-  const post = useGetPostsQuery(undefined, {
-    selectFromResult: (res) => res.data.find((post) => post.id === postId),
+  const { post } = useGetPostsQuery(undefined, {
+    selectFromResult: (res) => ({
+      ...res,
+      post: res.data.find((post) => post.id === postId),
+    }),
   })
 
   if (!post) {
