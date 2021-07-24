@@ -1,16 +1,18 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import { PostAuthor } from './PostAuthor'
 import { TimeAgo } from './TimeAgo'
 import { ReactionButtons } from './ReactionButtons'
-import { selectPostById } from './postsSlice'
+
+import { useGetPostsQuery } from '../api/apiSlice'
 
 export const SinglePostPage = ({ match }) => {
   const { postId } = match.params
 
-  const post = useSelector((state) => selectPostById(state, postId))
+  const post = useGetPostsQuery(undefined, {
+    selectFromResult: (res) => res.data.find((post) => post.id === postId),
+  })
 
   if (!post) {
     return (
