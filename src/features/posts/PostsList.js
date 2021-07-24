@@ -36,6 +36,7 @@ export const PostsList = () => {
   const {
     data: posts = [],
     isFetching,
+    isLoading,
     isSuccess,
     isError,
     error,
@@ -49,7 +50,7 @@ export const PostsList = () => {
 
   let content
 
-  if (isFetching) {
+  if (isLoading) {
     content = <div className="loader">Loading...</div>
   } else if (isSuccess) {
     content = sortedPosts.map((post) => (
