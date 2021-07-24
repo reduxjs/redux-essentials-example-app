@@ -8,11 +8,13 @@ import { selectAllUsers } from '../users/usersSlice'
 import {
   selectAllNotifications,
   allNotificationsRead,
+  useGetNotificationsQuery,
 } from './notificationsSlice'
 
 export const NotificationsList = () => {
   const dispatch = useDispatch()
-  const notifications = useSelector(selectAllNotifications)
+  // const notifications = useSelector(selectAllNotifications)
+  const { data: notifications = [] } = useGetNotificationsQuery()
   const users = useSelector(selectAllUsers)
 
   useEffect(() => {

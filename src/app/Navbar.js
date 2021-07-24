@@ -5,16 +5,22 @@ import { Link } from 'react-router-dom'
 import {
   fetchNotifications,
   selectAllNotifications,
+  fetchNotificationsWebsocket,
+  useGetNotificationsQuery,
 } from '../features/notifications/notificationsSlice'
 
 export const Navbar = () => {
   const dispatch = useDispatch()
   const notifications = useSelector(selectAllNotifications)
-  const numUnreadNotifications = notifications.filter((n) => !n.read).length
+
+  const { data = [] } = useGetNotificationsQuery()
+  console.log('Notifications: ', data)
 
   const fetchNewNotifications = () => {
-    dispatch(fetchNotifications())
+    dispatch(fetchNotificationsWebsocket())
   }
+
+  const numUnreadNotifications = data.filter((n) => !n.read).length
 
   let unreadNotificationsBadge
 
