@@ -90,6 +90,14 @@ new Server({
       return result
     })
 
+    this.patch('/posts/:postId', function (schema, req) {
+      // This expects a body in the form of `{post: Partial<Post>}`
+      const data = this.normalizedRequestAttrs()
+
+      const post = schema.posts.find(req.params.postId).update(data)
+      return post
+    })
+
     this.get('/posts/:postId/comments', (schema, req) => {
       const post = schema.posts.find(req.params.postId)
       return post.comments
