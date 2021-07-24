@@ -213,10 +213,31 @@ const apiServer = new Server({
 
 const socketServer = new MockSocketServer('ws://localhost')
 
+let currentSocket
+
+const sendMessage = (socket, obj) => {
+  socket.send(JSON.stringify(obj))
+}
+
+const sendRandomNotifications = (socket, since) => {
+  const numNotifications = getRandomInt(1, 5)
+
+  const notifications = generateRandomNotifications(
+    since,
+    numNotifications,
+    apiServer.schema
+  )
+
+  sendMessage(socket, { type: 'notifications', payload: notifications })
+}
+
+export const forceGenerateNotifications = (since) => {
+  sendRandomNotifications(currentSocket, since)
+}
+
 socketServer.on('connection', (socket) => {
-  const sendMessage = (obj) => {
-    socket.send(JSON.stringify(obj))
-  }
+  currentSocket = socket
+
   socket.on('message', (data) => {
     const message = JSON.parse(data)
 
@@ -227,16 +248,7 @@ socketServer.on('connection', (socket) => {
       }
       case 'notifications': {
         const since = message.payload
-
-        const numNotifications = getRandomInt(1, 5)
-
-        const notifications = generateRandomNotifications(
-          since,
-          numNotifications,
-          apiServer.schema
-        )
-
-        sendMessage({ type: 'notifications', payload: notifications })
+        sendRandomNotifications(socket, since)
         break
       }
       default:
