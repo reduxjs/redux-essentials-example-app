@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 
@@ -34,19 +34,27 @@ let PostExcerpt = ({ post }) => {
 
 export const PostsList = () => {
   const {
-    data: posts,
+    data: posts = [],
     isFetching,
     isSuccess,
     isError,
     error,
   } = useGetPostsQuery()
 
+  const sortedPosts = useMemo(() => {
+    const sortedPosts = posts.slice()
+    sortedPosts.sort((a, b) => b.date.localeCompare(a.date))
+    return sortedPosts
+  }, [posts])
+
   let content
 
   if (isFetching) {
     content = <div className="loader">Loading...</div>
   } else if (isSuccess) {
-    content = posts.map((post) => <PostExcerpt key={post.id} post={post} />)
+    content = sortedPosts.map((post) => (
+      <PostExcerpt key={post.id} post={post} />
+    ))
   } else if (isError) {
     content = <div>{error.toString()}</div>
   }
