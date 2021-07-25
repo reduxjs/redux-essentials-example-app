@@ -1,13 +1,19 @@
 import {
+  createAction,
   createSlice,
   createAsyncThunk,
   createEntityAdapter,
   createSelector,
+  isAnyOf,
 } from '@reduxjs/toolkit'
 
 import { client } from '../../api/client'
 import { forceGenerateNotifications } from '../../api/server'
 import { apiSlice } from '../api/apiSlice'
+
+const notificationsReceived = createAction(
+  'notifications/notificationsReceived'
+)
 
 export const extendedApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -16,7 +22,7 @@ export const extendedApi = apiSlice.injectEndpoints({
       transformResponse: (res) => res.notifications,
       async onCacheEntryAdded(
         arg,
-        { updateCachedData, cacheDataLoaded, cacheEntryRemoved }
+        { updateCachedData, cacheDataLoaded, cacheEntryRemoved, dispatch }
       ) {
         // create a websocket connection when the cache subscription starts
         const ws = new WebSocket('ws://localhost')
@@ -36,6 +42,7 @@ export const extendedApi = apiSlice.injectEndpoints({
                   draft.push(...message.payload)
                   draft.sort((a, b) => b.date.localeCompare(a.date))
                 })
+                dispatch(notificationsReceived(message.payload))
                 break
               }
               default:
@@ -67,9 +74,7 @@ const selectNotificationsData = createSelector(
   (notificationsResult) => notificationsResult.data ?? emptyNotifications
 )
 
-const notificationsAdapter = createEntityAdapter({
-  sortComparer: (a, b) => b.date.localeCompare(a.date),
-})
+const notificationsAdapter = createEntityAdapter({})
 
 export const fetchNotifications = createAsyncThunk(
   'notifications/fetchNotifications',
@@ -92,6 +97,11 @@ export const fetchNotificationsWebsocket = () => (dispatch, getState) => {
   forceGenerateNotifications(latestTimestamp)
 }
 
+const matchNotificationsReceived = isAnyOf(
+  notificationsReceived,
+  extendedApi.endpoints.getNotifications.matchFulfilled
+)
+
 const notificationsSlice = createSlice({
   name: 'notifications',
   initialState: notificationsAdapter.getInitialState(),
@@ -103,12 +113,18 @@ const notificationsSlice = createSlice({
     },
   },
   extraReducers(builder) {
-    builder.addCase(fetchNotifications.fulfilled, (state, action) => {
+    builder.addMatcher(matchNotificationsReceived, (state, action) => {
       Object.values(state.entities).forEach((notification) => {
         // Any notifications we've read are no longer new
         notification.isNew = !notification.read
       })
-      notificationsAdapter.upsertMany(state, action.payload)
+
+      const newNotificationEntries = action.payload.map((notification) => ({
+        id: notification.id,
+        isNew: true,
+        read: false,
+      }))
+      notificationsAdapter.upsertMany(state, newNotificationEntries)
     })
   },
 })
@@ -119,4 +135,6 @@ export default notificationsSlice.reducer
 
 export const {
   selectAll: selectAllNotifications,
+  selectById: selectNotificationById,
+  selectEntities: selectNotificationsMetadata,
 } = notificationsAdapter.getSelectors((state) => state.notifications)
