@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useLayoutEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { formatDistanceToNow, parseISO } from 'date-fns'
 import classnames from 'classnames'
@@ -17,7 +17,7 @@ export const NotificationsList = () => {
   const { data: notifications = [] } = useGetNotificationsQuery()
   const users = useSelector(selectAllUsers)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     dispatch(allNotificationsRead())
   })
 
