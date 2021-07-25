@@ -7,15 +7,26 @@ import { Provider } from 'react-redux'
 
 import { extendedApi } from './features/users/usersSlice'
 
-import './api/server'
+import { worker } from './api/browser'
 
 store.dispatch(extendedApi.endpoints.getUsers.initiate())
 
-ReactDOM.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <App />
-    </Provider>
-  </React.StrictMode>,
-  document.getElementById('root')
-)
+const renderApp = () => {
+  ReactDOM.render(
+    <React.StrictMode>
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </React.StrictMode>,
+    document.getElementById('root')
+  )
+}
+
+if (process.env.NODE_ENV === 'development') {
+  worker.start({ onUnhandledRequest: 'bypass' }).then(() => {
+    renderApp()
+    // worker.printHandlers() // Optional: nice for debugging to see all available route handlers that will be intercepted
+  })
+} else {
+  renderApp()
+}

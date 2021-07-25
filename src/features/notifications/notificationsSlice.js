@@ -6,7 +6,7 @@ import {
 } from '@reduxjs/toolkit'
 
 import { client } from '../../api/client'
-import { forceGenerateNotifications } from '../../api/server'
+import { forceGenerateNotifications } from '../../api/handlers'
 import { apiSlice } from '../api/apiSlice'
 
 export const extendedApi = apiSlice.injectEndpoints({
@@ -61,7 +61,8 @@ export const { useGetNotificationsQuery } = extendedApi
 
 const emptyNotifications = []
 
-export const selectNotificationsResult = extendedApi.endpoints.getNotifications.select()
+export const selectNotificationsResult =
+  extendedApi.endpoints.getNotifications.select()
 const selectNotificationsData = createSelector(
   selectNotificationsResult,
   (notificationsResult) => notificationsResult.data ?? emptyNotifications
@@ -77,9 +78,7 @@ export const fetchNotifications = createAsyncThunk(
     const allNotifications = selectAllNotifications(getState())
     const [latestNotification] = allNotifications
     const latestTimestamp = latestNotification ? latestNotification.date : ''
-    const response = await client.get(
-      `/fakeApi/notifications?since=${latestTimestamp}`
-    )
+    const response = await client.get(`/notifications?since=${latestTimestamp}`)
     return response.notifications
   }
 )
@@ -117,6 +116,5 @@ export const { allNotificationsRead } = notificationsSlice.actions
 
 export default notificationsSlice.reducer
 
-export const {
-  selectAll: selectAllNotifications,
-} = notificationsAdapter.getSelectors((state) => state.notifications)
+export const { selectAll: selectAllNotifications } =
+  notificationsAdapter.getSelectors((state) => state.notifications)

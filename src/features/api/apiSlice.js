@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const apiSlice = createApi({
   reducerPath: 'api',
-  baseQuery: fetchBaseQuery({ baseUrl: '/fakeApi' }),
+  baseQuery: fetchBaseQuery({ baseUrl: '/' }),
   tagTypes: ['Posts'],
   endpoints: (builder) => ({
     getPosts: builder.query({
@@ -39,7 +39,7 @@ export const apiSlice = createApi({
         )
         try {
           await queryFulfilled
-        } catch {
+        } catch (err) {
           patchResult.undo()
         }
       },
@@ -47,8 +47,5 @@ export const apiSlice = createApi({
   }),
 })
 
-export const {
-  useGetPostsQuery,
-  useEditPostMutation,
-  useAddReactionMutation,
-} = apiSlice
+export const { useGetPostsQuery, useEditPostMutation, useAddReactionMutation } =
+  apiSlice
