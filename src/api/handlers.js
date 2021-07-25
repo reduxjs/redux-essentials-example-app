@@ -27,26 +27,24 @@ const notificationTemplates = [
 ]
 
 export const handlers = [
-  rest.get('/posts', function (req, res, ctx) {
+  rest.get('/fakeApi/posts', function (req, res, ctx) {
     return res(ctx.json({ posts: db.post.getAll() }))
   }),
-  rest.post('/posts', function (req, res, ctx) {
-    const data = req.body
-    data.date = new Date().toISOString()
-    // Work around some odd behavior by Mirage that's causing an extra
-    // user entry to be created unexpectedly when we only supply a userId.
-    // It really want an entire Model passed in as data.user for some reason.
-    const user = db.user.findFirst({ where: { id: { equals: data.userId } } })
-    data.user = user
-
-    if (data.content === 'error') {
+  rest.post('/fakeApi/posts', function (req, res, ctx) {
+    const { user: userId, ...postData } = req.body.post
+    if (postData.content === 'error') {
       throw new Error('Could not save the post!')
     }
 
-    const result = db.post.create(data)
+    const user = db.user.findFirst({ where: { id: { equals: userId } } })
+
+    const result = db.post.create({
+      ...postData,
+      user,
+    })
     return res(ctx.json(result))
   }),
-  rest.patch('/posts/:postId', (req, res, ctx) => {
+  rest.patch('/fakeApi/posts/:postId', (req, res, ctx) => {
     const {
       post: { id, ...data },
     } = req.body
@@ -57,14 +55,14 @@ export const handlers = [
     return res(ctx.json(updatedPost))
   }),
 
-  rest.get('/posts/:postId/comments', (req, res, ctx) => {
+  rest.get('/fakeApi/posts/:postId/comments', (req, res, ctx) => {
     const post = db.post.findFirst({
       where: { id: { equals: req.params.postId } },
     })
     return res(ctx.json({ comments: post.comments }))
   }),
 
-  rest.post('/posts/:postId/reactions', (req, res, ctx) => {
+  rest.post('/fakeApi/posts/:postId/reactions', (req, res, ctx) => {
     const postId = req.params.postId
     const reaction = req.body.reaction
     const post = db.post.findFirst({
@@ -83,7 +81,7 @@ export const handlers = [
 
     return res(ctx.json(updatedPost))
   }),
-  rest.get('/notifications', (req, res, ctx) => {
+  rest.get('/fakeApi/notifications', (req, res, ctx) => {
     const numNotifications = getRandomInt(1, 5)
 
     let pastDate
@@ -116,12 +114,12 @@ export const handlers = [
 
     return res(ctx.json({ notifications }))
   }),
-  rest.get('/users', (req, res, ctx) => {
+  rest.get('/fakeApi/users', (req, res, ctx) => {
     return res(ctx.json({ users: db.user.getAll() }))
   }),
-  ...db.user.toHandlers(),
-  ...db.post.toHandlers(),
-  ...db.comment.toHandlers(),
+  ...db.user.toHandlers('rest', 'http://localhost/fakeApi/'),
+  ...db.post.toHandlers('rest', 'http://localhost/fakeApi/'),
+  ...db.comment.toHandlers('rest', 'http://localhost/fakeApi/'),
 ]
 
 const socketServer = new MockSocketServer('ws://localhost')
