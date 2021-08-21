@@ -7,12 +7,12 @@ import { Provider } from 'react-redux'
 
 import { worker } from './api/server'
 
-import { fetchUsers } from './features/users/usersSlice'
+import { apiSlice } from './features/api/apiSlice'
 
 // Start our mock API server
 worker.start({ onUnhandledRequest: 'bypass' })
 
-store.dispatch(fetchUsers())
+store.dispatch(apiSlice.endpoints.getUsers.initiate())
 
 ReactDOM.render(
   <React.StrictMode>
