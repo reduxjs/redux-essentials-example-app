@@ -40,11 +40,11 @@ export const EditPostForm = ({ match }) => {
                     />
                     <label htmlFor="postContent">Content:</label>
                     <textarea
-                    id="postContent"
-                    name="postContent"
-                    value={content}
-                    onChange={onContentChanged}
-                />
+                        id="postContent"
+                        name="postContent"
+                        value={content}
+                        onChange={onContentChanged}
+                    />
             </form>
             <button type="button" onClick={onSavePostClicked}>
                 Save Post
