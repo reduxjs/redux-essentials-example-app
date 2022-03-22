@@ -19,6 +19,7 @@
     "react-redux": "^7.2.4",
     "react-router-dom": "^5.1.2",
     "react-scripts": "^4",
+    "redux-devtools": "3.7.0",
     "seedrandom": "^3.0.5",
     "txtgen": "^2.2.4"
   },
