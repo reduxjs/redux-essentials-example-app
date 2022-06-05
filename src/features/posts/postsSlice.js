@@ -1,5 +1,6 @@
-import { createSlice, nanoid } from '@reduxjs/toolkit';
-import { sub } from 'date-fns';
+import { createSlice, nanoid, createAsyncThunk } from '@reduxjs/toolkit';
+import { client } from '../../api/client';
+// import { sub } from 'date-fns';
 
 // const initialState = [
   // { 
@@ -22,6 +23,16 @@ const initialState = {
   status: 'pending',
   error: null,
 };
+
+// thunk - вызывает ajax запрос для получения списка сообщений из серверной части
+// // createAsyncThunk принимает два аргумента:
+// 1- Строка 'posts/fetchPosts', которая будет использоваться в качестве префикса для сгенерированных типов действий.
+// 2- Фун. обратного вызова «создатель полезной нагрузки», которая должна возвращать 
+//    Promise содержащий некоторые данные или отклоненный Promiseс ошибкой
+export const fetchPosts = createAsyncThunk('posts/fetchPosts', async () => {
+  const response = await client.get('/fakeApi/posts');
+  return response.data;
+})
 
 const postsSlice = createSlice({
   name: 'posts',
