@@ -33,7 +33,6 @@ export const PostsList = () => {
   // const posts = useSelector(state => state.posts); // state.posts необходимый для работы срез данных
   
   const posts = useSelector(selectAllPosts); // useSelector -> store.getState() -> корневой state -> selectorAllPosts(state) -> profit
-  
   const postStatus = useSelector((state) => state.posts.status);
   const error = useSelector((state) => state.posts.error);
   
