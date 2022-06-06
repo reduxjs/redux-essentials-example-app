@@ -26,7 +26,7 @@ const initialState = {
 
 
  
-// Результат вызова createAsyncThunk одна функция fetchPosts, имеющая три свойства fetchPosts.(pending|fulfilled|failrule)
+// Результат вызова createAsyncThunk одна функция fetchPosts, имеющая три свойства fetchPosts.(pending|fulfilled|rejected)
 // 1)fetchPosts - выполняет колбек функцию (из второго аргумента), но перед выполнением она вызовет внутр. свойство(функция) fetchPosts.pending() для отправки типа действия 'posts/fetchPosts/pending'
 // 2)fetchPosts.pending() 3)fetchPosts.fulfilled()  4)fetchPosts.rejected() - три функции создателя действия, используются для определения статуса выполнения thunk'a
 // и его обработки в createSlice({ extraReducers(builder): { ТУТ-> builder.addCase() } })
@@ -37,7 +37,7 @@ const initialState = {
 
 export const fetchPosts = createAsyncThunk( // // fetchPosts- выполняет ajax запрос на сервер(имитация) для получения списка сообщений.
   'posts/fetchPosts',
-  // 'posts/fetchPosts' - использоваться в качестве префикса для генерации трех типов действий 'posts/fetchPosts/(pending|fulfilled|failrule)'.
+  // 'posts/fetchPosts' - использоваться в качестве префикса для генерации трех типов действий 'posts/fetchPosts/(pending|fulfilled|rejected)'.
   
   async () => {
     // колбек фун. ( или "payloadCreator"): возвращает (промис из-за наличия async | значение синхронно без async)
