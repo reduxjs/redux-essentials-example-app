@@ -50,28 +50,36 @@ export const fetchPosts = createAsyncThunk( // // fetchPosts- выполняет
   // Третий аргумент options объект (необязательно).
 )
 
+export const addNewPost = createAsyncThunk(
+  'posts/addNewPost',
+  async (initialPost) => { // параметр - объект. Он содержащий данные из формы наход. в компоненте AddPostForm.js
+    const response = await client.post('/fakeApi/posts', initialPost);
+    return response.data;
+  }
+)
+
 const postsSlice = createSlice({
   name: 'posts',
   initialState,
   reducers: {
-    // Когда мы пишем postAdded функцию редюсера, createSlice автоматически создает функцию создания действия с тем-же именем, что и у редюсера.
-    postAdded: {
-      reducer(state, { payload }) {
-        state.posts.push(payload) // это мутация. Она преобразуются в безопасные неизменяемые обновления за счет Immer'a
-      },
-      prepare(title, content, userId) { // или 'prepare callback', вызывается перед вызовом  reducer, чтобы подготовить данные экшена. 
-        return { // Результат выполнения функции prepare объект action, который прокидывается во второй аргумент функции reducer выше. 
-          payload: {
-            id: nanoid(), // Уникальные идентификаторы и другие случайные значения положено вычислять до попадания в редьюсер. Редюсер должен содержать основную логику.
-            date: new Date().toISOString(), // Создание даты и её трансформация в формат ISO. (гг.мм.дд)
-            title,
-            content,
-            user: userId,
-            reactions: {thumbsUp: 0, hooray: 0, heart: 0, rocket: 0, eyes: 0},
-          }
-        }
-      },
-    },
+    // // Когда мы пишем postAdded функцию редюсера, createSlice автоматически создает функцию создания действия с тем-же именем, что и у редюсера.
+    // postAdded: {
+    //   reducer(state, { payload }) {
+    //     state.posts.push(payload) // это мутация. Она преобразуются в безопасные неизменяемые обновления за счет Immer'a
+    //   },
+    //   prepare(title, content, userId) { // или 'prepare callback', вызывается перед вызовом  reducer, чтобы подготовить данные экшена. 
+    //     return { // Результат выполнения функции prepare объект action, который прокидывается во второй аргумент функции reducer выше. 
+    //       payload: {
+    //         id: nanoid(), // Уникальные идентификаторы и другие случайные значения положено вычислять до попадания в редьюсер. Редюсер должен содержать основную логику.
+    //         date: new Date().toISOString(), // Создание даты и её трансформация в формат ISO. (гг.мм.дд)
+    //         title,
+    //         content,
+    //         user: userId,
+    //         reactions: {thumbsUp: 0, hooray: 0, heart: 0, rocket: 0, eyes: 0},
+    //       }
+    //     }
+    //   },
+    // },
     reactionAdded: (state, action) => {
       const { postId, reaction } = action.payload;
       const existingPost = state.posts.find(post => post.id === postId);
@@ -104,6 +112,9 @@ const postsSlice = createSlice({
       .addCase(fetchPosts.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
+      })
+      .addCase(addNewPost.fulfilled, (state, action) => {
+        state.posts.push(action.payload);
       })
   }
 });
