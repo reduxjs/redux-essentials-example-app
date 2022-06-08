@@ -37,7 +37,7 @@ export const PostsList = () => {
   const error = useSelector((state) => state.posts.error);
   
   useEffect(() => {
-    if(postStatus === 'pending') {
+    if(postStatus === 'idle') {
       dispatch(fetchPosts())
     }
   }, [postStatus, dispatch]);

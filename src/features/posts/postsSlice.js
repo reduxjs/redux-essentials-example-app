@@ -20,7 +20,7 @@ import { client } from '../../api/client';
 
 const initialState = {
   posts: [],
-  status: 'pending',
+  status: 'idle', // Состояние загрузки обычно должно храниться как перечисление, например 'idle' | 'loading' | 'succeeded' | 'failed'
   error: null,
 };
 
@@ -40,15 +40,16 @@ export const fetchPosts = createAsyncThunk( // // fetchPosts- выполняет
   // 'posts/fetchPosts' - использоваться в качестве префикса для генерации трех типов действий 'posts/fetchPosts/(pending|fulfilled|rejected)'.
   
   async () => {
-    // колбек фун. ( или "payloadCreator"): возвращает (промис из-за наличия async | значение синхронно без async)
-    // Перед началом выполнения эта функция всегда вызывает создатель действия fetchPosts.pending() (чтобы указать о состоянии выполнения thunk'a), 
-    // который сразу будет прослушан в extraReducer
-    // Результат выполнения: (Promise c данными && вызов fetchPosts.fulfilled() | отклоненный Promiseс ошибкой && вызов fetchPosts.rejected()]
+    // колбек «создатель полезной нагрузки», который должен возвращать Promise.
+    // Перед началом выполнения эта функция всегда вызывает создатель действия fetchPosts.pending(), 
+    // чтобы указать хранилищу о начале выполнения thunk'a, который сразу будет прослушан в extraReducer
+    // Результат выполнения: Promise c данными и вызов fetchPosts.fulfilled() ИЛИ отклоненный Promise с ошибкой и вызов fetchPosts.rejected() 
+    // не забудь про всплытие ошибки из rejected, для этого нужно юзать  .unwrap() https://redux-toolkit.js.org/api/createAsyncThunk#unwrapping-result-actions
     const response = await client.get('/fakeApi/posts');
     return response.data;
   },
   // Третий аргумент options объект (необязательно).
-)
+) // Всё удобство createAsyncThunk API в том, что отправкой действий он занимается самостоятельно.
 
 export const addNewPost = createAsyncThunk(
   'posts/addNewPost',
@@ -100,9 +101,9 @@ const postsSlice = createSlice({
   extraReducers(builder) { 
     // Гайд: https://redux.js.org/tutorials/essentials/part-5-async-logic#reducers-and-loading-actions
     builder
-      // Перед выполнением фун. fetchPosts вызывает функцию fetchPosts.pending (создатель действия), которая посылает тип действия 'posts/fetchPosts/pending'
-      // этот тип действия отлавливатся и обрабатыватся в соответ. обработчике, в нашем случе в .addCase(fetchPosts.pending, ... )
-      .addCase(fetchPosts.pending, (state, action) => { // т.е. ТУТ
+    // Перед выполнением фун. fetchPosts вызывает функцию fetchPosts.pending (создатель действия), которая посылает тип действия 'posts/fetchPosts/pending'
+    // этот тип действия отлавливатся и обрабатыватся в соответ. обработчике, в нашем случе в .addCase(fetchPosts.pending, ... )
+    .addCase(fetchPosts.pending, (state, action) => { // т.е. ТУТ
         state.status = 'loading'; 
       })
       .addCase(fetchPosts.fulfilled, (state, action) => {

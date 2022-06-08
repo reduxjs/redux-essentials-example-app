@@ -22,11 +22,21 @@ export const AddPostForm = () => {
       try {
         setRequestStatus('pending');
         
-        await dispatch(addNewPost({ title, content, user:userId })).unwrap()
-        // Redux-toolkit добавляет .unwrap() функцию к возвращаемому Promise, которая раскрывает промис 
-        // и возвращает содержимое action.payload в случае fulfilled или помогает всплытию ошибки в случае rejected.
+       
+        // unwrap INFO: https://redux.js.org/tutorials/essentials/part-5-async-logic#checking-thunk-results-in-components
+        await dispatch(addNewPost({ title, content, user:userId })).unwrap();
+        // Redux-toolkit добавляет метод .unwrap() к возвращаемому Promise. Исп. этого метода возвр. еще один промис 
+        // содержащий результат action.payload в случае fulfilled или помогает всплытию ошибки в случае rejected.
         // Это позволяет нам обрабатывать успехи и неудачи в компоненте, используя обычную try/catch логику.
-        // https://redux.js.org/tutorials/essentials/part-5-async-logic#checking-thunk-results-in-components
+        // Грубо говоря .unwrap() в зависимости что вернул промис в поле action.type дописывает .then с доп логикой
+        
+        // Пример того, что будет заменять использование функции unwrap (пример условный):
+        // Если промис вернул экшн в котором action.type === "posts/addNewPost/fulfilled", тогда
+        // dispatch(...) + .then((action) => action.payload), если исп. с await то можно сразу получить наружу содержимое
+
+        // Если промис вернул экшн в котором action.type === "posts/addNewPost/rejected", тогда
+        // dispatch(...) + .then(action => {throw action.error.message}) - ошибка всплывает и уже обрабатывается try/catch (await никак не влияет на всплытие)
+        // в моем случае await нужен для того, чтобы очистка полей произошла после того, как выполнился thunk, не важно с каким результатом.
 
         setTitle('');
         setContent('');
