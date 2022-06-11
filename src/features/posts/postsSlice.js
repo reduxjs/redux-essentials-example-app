@@ -1,4 +1,4 @@
-import { createSlice, nanoid, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
 import { client } from '../../api/client';
 // import { sub } from 'date-fns';
 
@@ -130,7 +130,20 @@ export default postsSlice.reducer;
 
 
 // Пользовательские селекторы
-// stateпараметром для этих функций селектора является корневой объект состояния Redux, как и для встроенных анонимных селекторов, которые мы написали непосредственно внутри useSelector.
-export const selectAllPosts = state => state.posts.posts;
-
+// useDispatch посылает результат store.getState в первый аргумент пользовательского селектора т.е. в state 
+export const selectAllPosts = (state) => state.posts.posts;
 export const selectPostById = (state, postId) => state.posts.posts.find(post => post.id === postId)
+
+
+// Генерирует запоминаемые селекторы, которые будут пересчитывать результаты только при изменении входных данных.
+// Если мы попытаемся вызвать selectPostsByUser несколько раз, он будет повторно запускать селектор вывода только в том случае, если что-либо postsили userId изменилось
+export const selectPostByUser = createSelector(
+  // Когда мы вызываем selectPostsByUser(state, userId), createSelector передаем все аргументы в каждый из наших селекторов ввода. 
+  [
+    selectAllPosts, // Первый входной селектор будет иметь параметры (state и userId)
+    (state, userId) => userId // Второй входной селектор получит такие же параметры при вызове (state, userId)
+  ], 
+  
+  // Результат первого входного селектора будет posts, результат второго селектора будет userId
+  (posts, userId) => posts.filter(post => post.user === userId)  
+)
