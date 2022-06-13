@@ -205,10 +205,11 @@ export const handlers = [
     )
   }),
   rest.get('/fakeApi/notifications', (req, res, ctx) => {
+    const latestTimestamp = req.url.searchParams.get('since')
     const numNotifications = getRandomInt(1, 5)
 
     let notifications = generateRandomNotifications(
-      undefined,
+      latestTimestamp,
       numNotifications,
       db
     )
