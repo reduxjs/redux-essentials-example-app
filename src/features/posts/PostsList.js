@@ -27,6 +27,8 @@ const PostExcerpt = ({ post }) => {
   )
 }
 
+
+
 export const PostsList = () => {
   const dispatch = useDispatch();
   // Компоненты React читают данные из хранилища с помощью useSelector хука

@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, createSelector, createEntityAdapter } from '@reduxjs/toolkit';
 import { client } from '../../api/client';
 // import { sub } from 'date-fns';
 
@@ -18,11 +18,24 @@ import { client } from '../../api/client';
   // },
 // ];
 
-const initialState = {
-  posts: [],
-  status: 'idle', // Состояние загрузки обычно должно храниться как перечисление, например 'idle' | 'loading' | 'succeeded' | 'failed'
+
+
+const postsAdapter = createEntityAdapter({
+  sortCompare: (a, b) => b.date.localeCompare(a.date)
+});
+
+
+// const initialState = {
+//   posts: [],
+//   status: 'idle', // Состояние загрузки обычно должно храниться как перечисление, например 'idle' | 'loading' | 'succeeded' | 'failed'
+//   error: null,
+// };
+
+const initialState = postsAdapter.getInitialState({
+  status: 'idle',
   error: null,
-};
+})
+// getInitialState === { ids: [], entities: {}, + status: 'idle', + error: null }
 
 
  
@@ -61,9 +74,9 @@ export const addNewPost = createAsyncThunk(
 
 const postsSlice = createSlice({
   name: 'posts',
-  initialState,
+  initialState, // from getInitialAdapter
   reducers: {
-    // // Когда мы пишем postAdded функцию редюсера, createSlice автоматически создает функцию создания действия с тем-же именем, что и у редюсера.
+    // Когда мы пишем postAdded функцию редюсера, createSlice автоматически создает функцию создания действия с тем-же именем, что и у редюсера.
     // postAdded: {
     //   reducer(state, { payload }) {
     //     state.posts.push(payload) // это мутация. Она преобразуются в безопасные неизменяемые обновления за счет Immer'a
@@ -83,14 +96,18 @@ const postsSlice = createSlice({
     // },
     reactionAdded: (state, action) => {
       const { postId, reaction } = action.payload;
-      const existingPost = state.posts.find(post => post.id === postId);
+      // Используя нормализованную структуру данных, которая создана при помощи createEntityAdapter > .getInitialState
+      // мы уходим от поиска (On) и повышаем производительность
+      // const existingPost = state.posts.find(post => post.id === postId);
+      const existingPost = state.entities[postId];
       if(existingPost) {
         existingPost.reactions[reaction]++
       }
     },
     postUpdated: (state, action) => {
       const { id, title, content } = action.payload;
-      const existingPost = state.posts.find((post) => post.id === id);
+      // const existingPost = state.posts.find((post) => post.id === id);
+      const existingPost = state.entities[id];
       if (existingPost) {
         existingPost.title = title;
         existingPost.content = content;
@@ -103,21 +120,26 @@ const postsSlice = createSlice({
     builder
     // Перед выполнением фун. fetchPosts вызывает функцию fetchPosts.pending (создатель действия), которая посылает тип действия 'posts/fetchPosts/pending'
     // этот тип действия отлавливатся и обрабатыватся в соответ. обработчике, в нашем случе в .addCase(fetchPosts.pending, ... )
-    .addCase(fetchPosts.pending, (state, action) => { // т.е. ТУТ
-        state.status = 'loading'; 
-      })
+      .addCase(fetchPosts.pending, (state, action) => { // т.е. ТУТ
+          state.status = 'loading'; 
+        })
       .addCase(fetchPosts.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.posts = state.posts.concat(action.payload)
+        // state.posts = state.posts.concat(action.payload); // Аналог .upsertMany
+        postsAdapter.upsertMany(state, action.payload);
+        // редьюсер upsertMany как утилиту выполняющая мутирующие обновления.
+        // Он добавляет все входящие сообщения в состояние, передав черновик state и массив сообщений в action.payload
+        // Если в этом состоянии уже есть какие-либо элементы action.payload, upsertManyфункция объединит их вместе на основе совпадающих идентификаторов.
       })
+   // .addCase(addNewPost.fulfilled, (state, action) => {
+   //   state.posts.push(action.payload);
+   // })
+      .addCase(addNewPost.fulfilled, postsAdapter.addOne) // addOne готовый метода для добавления данных в стейт
       .addCase(fetchPosts.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
       })
-      .addCase(addNewPost.fulfilled, (state, action) => {
-        state.posts.push(action.payload);
-      })
-  }
+   }
 });
 
 
@@ -127,17 +149,33 @@ export const { postAdded, postUpdated, reactionAdded } = postsSlice.actions;
 
 export default postsSlice.reducer;
 
-
-
 // Пользовательские селекторы
-// useDispatch посылает результат store.getState в первый аргумент пользовательского селектора т.е. в state 
-export const selectAllPosts = (state) => state.posts.posts;
-export const selectPostById = (state, postId) => state.posts.posts.find(post => post.id === postId)
+// Селекторы в основном используются для инкапсуляции логики поиска определенных значений из состояния, 
+// логики фактического получения значений и повышения производительности за счет исключения дублирования кода в других компонентах.
+// export const selectAllPosts = (state) => state.posts.posts; // state === store.getState() из useDispatch()
+// export const selectPostById = (state, postId) => state.posts.posts.find(post => post.id === postId)
+
+export const {
+  selectAll: selectAllPosts,
+  selectById: selectPostById,
+  selectIds: selectPostIds
+} = postsAdapter.getSelectors(state => state.posts);
+// Заменяет написанные от руки selectAllPostsи selectPostById селекторные функции на сгенерированные postsAdapter.getSelectors. 
+// Поскольку селекторы вызываются с корневым объектом состояния Redux, им нужно знать, где найти данные наших сообщений в состоянии Redux, 
+// поэтому мы передаем небольшой селектор, который возвращает state.posts 
+// Сгенерированные функции селекторов всегда вызываются selectAllи selectById, поэтому мы можем использовать синтаксис деструктуризации ES6, 
+// чтобы переименовывать их при экспорте и сопоставлять старые имена селекторов.
 
 
-// Генерирует запоминаемые селекторы, которые будут пересчитывать результаты только при изменении входных данных.
+
+// createSelector Генерирует запоминаемые селекторы, которые будут пересчитывать результаты только при изменении входных данных.
 // Если мы попытаемся вызвать selectPostsByUser несколько раз, он будет повторно запускать селектор вывода только в том случае, если что-либо postsили userId изменилось
-export const selectPostByUser = createSelector(
+// createSelector API: https://redux.js.org/usage/deriving-data-selectors#createselector-overview 
+
+// createSelector это функция изначально находится в библиотеки Reselect, но для удобства её добавили в пакет Redux-toolkit
+// Reselect: https://github.com/reduxjs/reselect
+
+export const selectPostByUser = createSelector( 
   // Когда мы вызываем selectPostsByUser(state, userId), createSelector передаем все аргументы в каждый из наших селекторов ввода. 
   [
     selectAllPosts, // Первый входной селектор будет иметь параметры (state и userId)
