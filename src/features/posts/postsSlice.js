@@ -154,18 +154,17 @@ export default postsSlice.reducer;
 // логики фактического получения значений и повышения производительности за счет исключения дублирования кода в других компонентах.
 // export const selectAllPosts = (state) => state.posts.posts; // state === store.getState() из useDispatch()
 // export const selectPostById = (state, postId) => state.posts.posts.find(post => post.id === postId)
-
 export const {
   selectAll: selectAllPosts,
   selectById: selectPostById,
   selectIds: selectPostIds
 } = postsAdapter.getSelectors(state => state.posts);
+// {selectIds: ƒ, selectEntities: ƒ, selectAll: ƒ, selectTotal: ƒ, selectById: ƒ} = postsAdapter.getSelectors(state => state.posts)
 // Заменяет написанные от руки selectAllPostsи selectPostById селекторные функции на сгенерированные postsAdapter.getSelectors. 
 // Поскольку селекторы вызываются с корневым объектом состояния Redux, им нужно знать, где найти данные наших сообщений в состоянии Redux, 
 // поэтому мы передаем небольшой селектор, который возвращает state.posts 
 // Сгенерированные функции селекторов всегда вызываются selectAllи selectById, поэтому мы можем использовать синтаксис деструктуризации ES6, 
 // чтобы переименовывать их при экспорте и сопоставлять старые имена селекторов.
-
 
 
 // createSelector Генерирует запоминаемые селекторы, которые будут пересчитывать результаты только при изменении входных данных.
