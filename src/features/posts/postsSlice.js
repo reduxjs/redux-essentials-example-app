@@ -21,7 +21,7 @@ import { client } from '../../api/client';
 
 
 const postsAdapter = createEntityAdapter({
-  sortCompare: (a, b) => b.date.localeCompare(a.date)
+  sortComparer: (a, b) => b.date.localeCompare(a.date)
 });
 
 

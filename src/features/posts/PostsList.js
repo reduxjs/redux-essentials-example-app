@@ -57,7 +57,7 @@ export const PostsList = () => {
     content = <Spinner text="Loading..." />
   } else if (postStatus === 'succeeded') {
     content = orderedPostIds.map((postId) => (<PostExcerpt key={postId} postId={postId} />))
-  } else if (postStatus === 'error') {
+  } else if (postStatus === 'failed') {
     content = <div>{error}</div>
   }
 
