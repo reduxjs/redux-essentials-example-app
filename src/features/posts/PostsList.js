@@ -1,6 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { selectAllPosts, fetchPosts, selectPostIds } from './postsSlice'
+import React, { useMemo } from 'react'
 import { useGetPostsQuery } from '../api/apiSlice'
 import { PostExcerpt } from './PostExcerpt'
 import classnames from 'classnames'

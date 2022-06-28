@@ -1,12 +1,10 @@
 import React, { useState } from 'react'
-import { unwrapResult } from '@reduxjs/toolkit'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 //import { postAdded, addNewPost } from './postsSlice'
 import { selectAllUsers } from '../users/usersSlice'
 import { useAddNewPostMutation } from '../api/apiSlice'
 export const AddPostForm = () => {
-  const dispatch = useDispatch()
-  const [addRequestStatus, setAddRequestStatus] = useState('idle')
+  const [setAddRequestStatus] = useState('idle')
 
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')

@@ -1,11 +1,9 @@
 import {
   createAction,
   createSlice,
-  createAsyncThunk,
   createEntityAdapter,
   isAnyOf,
 } from '@reduxjs/toolkit'
-import { client } from '../../api/client'
 import { forceGenerateNotifications } from '../../api/server'
 import { apiSlice } from '../api/apiSlice'
 import { createSelector } from '@reduxjs/toolkit'
