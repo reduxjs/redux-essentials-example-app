@@ -1,5 +1,5 @@
 {
-  "name": "redux-essentials-example",
+  "name": "redux-docs-sample",
   "version": "1.0.0",
   "private": true,
   "dependencies": {
@@ -48,5 +48,7 @@
   },
   "msw": {
     "workerDirectory": "public"
-  }
+  },
+  "keywords": [],
+  "description": ""
 }
