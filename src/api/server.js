@@ -1,3 +1,4 @@
+// This is a fake REST API for our data. Our app fetches data from these fake endpoints. The 'endpoints' are where the API and our App connect. API's send requests from web apps or servers and receive their responses. 
 import { rest, setupWorker } from 'msw'
 import { factory, oneOf, manyOf, primaryKey } from '@mswjs/data'
 import { nanoid } from '@reduxjs/toolkit'

@@ -1,3 +1,5 @@
+//the entry point file for the application. Renders the Provider component and the App component.
+
 import React from 'react'
 import ReactDOM from 'react-dom'
 import './index.css'
