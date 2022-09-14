@@ -1,5 +1,9 @@
 /* Styles for entire app*/
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   --redux-color: #764abc;
 }
