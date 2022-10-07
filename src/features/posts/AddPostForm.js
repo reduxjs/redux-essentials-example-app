@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { postAdded } from './postsSlice'
 import { addNewPost } from './postsSlice'
+import { selectAllUsers } from '../users/usersSlice'
 
 export const AddPostForm = () => {
   const [title, setTitle] = useState('')
@@ -11,7 +11,7 @@ export const AddPostForm = () => {
   const [addRequestStatus, setAddRequestStatus] = useState('idle')
 
   const dispatch = useDispatch()
-  const users = useSelector((state) => state.users)
+  const users = useSelector(selectAllUsers)
 
   const onTitleChanged = (e) => setTitle(e.target.value)
   const onContentChanged = (e) => setContent(e.target.value)
@@ -74,11 +74,3 @@ export const AddPostForm = () => {
     </section>
   )
 }
-
-// This shows the complete Redux data flow cycle:
-
-// Our posts list read the initial set of posts from the store with useSelector and rendered the initial UI
-// We dispatched the postAdded action containing the data for the new post entry
-// The posts reducer saw the postAdded action, and updated the posts array with the new entry
-// The Redux store told the UI that some data had changed
-// The posts list read the updated posts array, and re-rendered itself to show the new post

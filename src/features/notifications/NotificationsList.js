@@ -16,7 +16,6 @@ export const NotificationsList = () => {
   const users = useSelector(selectAllUsers)
 
   useLayoutEffect(() => {
-    // no data changes, so the component doesn't re-render.
     dispatch(allNotificationsRead())
   })
 

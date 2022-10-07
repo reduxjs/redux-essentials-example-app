@@ -15,6 +15,7 @@ export const UsersList = () => {
   return (
     <section>
       <h2>Users</h2>
+
       <ul>{renderedUsers}</ul>
     </section>
   )
