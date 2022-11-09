@@ -10,7 +10,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
+.header {
+  text-align: center;
+}
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
@@ -99,6 +101,7 @@ section {
   margin-left: auto;
   margin-right: auto;
   padding: 0 1.5rem;
+  height: auto;
 }
 
 section h1 {
@@ -134,7 +137,9 @@ section h1 {
 p.post-content {
   margin-top: 10px;
 }
-
+section.posts-list {
+  padding-bottom: 100px;
+}
 .button {
   display: inline-block;
   background: #1976d2;
