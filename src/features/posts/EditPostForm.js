@@ -1,43 +1,42 @@
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { postAdded } from './postsSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 
-export const AddPostForm = () => {
-  // create local state for title and content of posts
-  const [title, setTitle] = useState('')
-  const [content, setContent] = useState('')
+import { postUpdated } from './postsSlice'
 
-  // initiate dispatch for adding new posts
+export const EditPostForm = ({ match }) => {
+  const { postId } = match.params
+
+  const post = useSelector((state) =>
+    state.posts.find((post) => post.id === postId)
+  )
+
+  const [title, setTitle] = useState(post.title)
+  const [content, setContent] = useState(post.content)
+
   const dispatch = useDispatch()
+  const history = useHistory()
 
-  // update the title and content on change locally
   const onTitleChanged = (e) => setTitle(e.target.value)
   const onContentChanged = (e) => setContent(e.target.value)
 
-  // save new post on click
   const onSavePostClicked = () => {
     if (title && content) {
-      dispatch(
-        postAdded({
-          title,
-          content,
-        })
-      )
-
-      setTitle('')
-      setContent('')
+      dispatch(postUpdated({ id: postId, title, content }))
+      history.push(`/posts/${postId}`)
     }
   }
 
   return (
     <section>
-      <h2>Add a New Post</h2>
+      <h2>Edit Post</h2>
       <form>
         <label htmlFor="postTitle">Post Title:</label>
         <input
           type="text"
           id="postTitle"
           name="postTitle"
+          placeholder="What's on your mind?"
           value={title}
           onChange={onTitleChanged}
         />
@@ -48,10 +47,10 @@ export const AddPostForm = () => {
           value={content}
           onChange={onContentChanged}
         />
-        <button type="button" onClick={onSavePostClicked}>
-          Save Post
-        </button>
       </form>
+      <button type="button" onClick={onSavePostClicked}>
+        Save Post
+      </button>
     </section>
   )
 }
