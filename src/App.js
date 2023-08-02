@@ -1,12 +1,19 @@
-import React from 'react'
+import React from "react";
 import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Redirect,
-} from 'react-router-dom'
+  Redirect
+} from "react-router-dom";
 
-import { Navbar } from './app/Navbar'
+import { Navbar } from "./app/Navbar";
+import { PostList } from "./components/PostList";
+import { NotificationList } from "./features/notifications/NotificationsList";
+import { AddPostForm } from "./features/posts/AddPostForm";
+import { EditPostForm } from "./features/posts/EditPostForm";
+import { SinglePost } from "./features/posts/SinglePost";
+import { UserPage } from "./features/users/UserPage";
+import { UsersList } from "./features/users/UsersList";
 
 function App() {
   return (
@@ -18,16 +25,22 @@ function App() {
             exact
             path="/"
             render={() => (
-              <section>
-                <h2>Welcome to the Redux Essentials example app!</h2>
-              </section>
+              <React.Fragment>
+                <PostList />
+                <AddPostForm />
+              </React.Fragment>
             )}
           />
-          <Redirect to="/" />
+
+          <Route path="/editPost/:postId" component={EditPostForm} />
+          <Route path="/posts/:postId" component={SinglePost} />
+          <Route exact path="/users" component={UsersList} />
+          <Route exact path="/users/:userId" component={UserPage} />
+          <Route exact path="/notifications" component={NotificationList} />
         </Switch>
       </div>
     </Router>
-  )
+  );
 }
 
-export default App
+export default App;
