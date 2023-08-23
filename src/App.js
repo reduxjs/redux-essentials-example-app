@@ -17,6 +17,8 @@ function App() {
               </section>
             }
           />
+          {/* use `const { postId } = useParams()` in components to access params */}
+          {/* use `const navigate = useNavigate(); navigate('/')` instead `const history = useHistory(); history.push(`/posts/${postId}`)`*/}
         </Routes>
       </div>
     </BrowserRouter>
