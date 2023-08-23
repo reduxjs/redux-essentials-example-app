@@ -1,12 +1,12 @@
 import { rest, setupWorker } from 'msw'
 import { factory, oneOf, manyOf, primaryKey } from '@mswjs/data'
 import { nanoid } from '@reduxjs/toolkit'
-import faker from 'faker'
 import seedrandom from 'seedrandom'
 import { Server as MockSocketServer } from 'mock-socket'
 import { setRandom } from 'txtgen'
 
 import { parseISO } from 'date-fns'
+import { faker } from '@faker-js/faker'
 
 const NUM_USERS = 3
 const POSTS_PER_USER = 3
@@ -91,8 +91,8 @@ export const db = factory({
 })
 
 const createUserData = () => {
-  const firstName = faker.name.firstName()
-  const lastName = faker.name.lastName()
+  const firstName = faker.person.firstName()
+  const lastName = faker.person.lastName()
 
   return {
     firstName,
@@ -105,7 +105,7 @@ const createUserData = () => {
 const createPostData = (user) => {
   return {
     title: faker.lorem.words(),
-    date: faker.date.recent(RECENT_NOTIFICATIONS_DAYS).toISOString(),
+    date: faker.date.recent({ RECENT_NOTIFICATIONS_DAYS }).toISOString(),
     user,
     content: faker.lorem.paragraphs(),
     reactions: db.reaction.create(),
@@ -141,7 +141,7 @@ export const handlers = [
       return res(
         ctx.delay(ARTIFICIAL_DELAY_MS),
         ctx.status(500),
-        ctx.json('Server error saving this post!')
+        ctx.json('Server error saving this post!'),
       )
     }
 
@@ -168,7 +168,7 @@ export const handlers = [
     })
     return res(
       ctx.delay(ARTIFICIAL_DELAY_MS),
-      ctx.json(serializePost(updatedPost))
+      ctx.json(serializePost(updatedPost)),
     )
   }),
 
@@ -178,7 +178,7 @@ export const handlers = [
     })
     return res(
       ctx.delay(ARTIFICIAL_DELAY_MS),
-      ctx.json({ comments: post.comments })
+      ctx.json({ comments: post.comments }),
     )
   }),
 
@@ -201,7 +201,7 @@ export const handlers = [
 
     return res(
       ctx.delay(ARTIFICIAL_DELAY_MS),
-      ctx.json(serializePost(updatedPost))
+      ctx.json(serializePost(updatedPost)),
     )
   }),
   rest.get('/fakeApi/notifications', (req, res, ctx) => {
@@ -210,7 +210,7 @@ export const handlers = [
     let notifications = generateRandomNotifications(
       undefined,
       numNotifications,
-      db
+      db,
     )
 
     return res(ctx.delay(ARTIFICIAL_DELAY_MS), ctx.json(notifications))
@@ -292,7 +292,7 @@ function generateRandomNotifications(since, numNotifications, db) {
     const template = randomFromArray(notificationTemplates)
     return {
       id: nanoid(),
-      date: faker.date.between(pastDate, now).toISOString(),
+      date: faker.date.between({ pastDate, now }).toISOString(),
       message: template,
       user: user.id,
     }
