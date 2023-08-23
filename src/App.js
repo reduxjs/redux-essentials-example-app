@@ -10,13 +10,12 @@ function App() {
       <div className="App">
         <Routes>
           <Route
-            exact
             path="/"
-            render={() => (
+            element={
               <section>
                 <h2>Welcome to the Redux Essentials example app!</h2>
               </section>
-            )}
+            }
           />
         </Routes>
       </div>
