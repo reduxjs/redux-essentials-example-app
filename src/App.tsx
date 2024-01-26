@@ -7,6 +7,7 @@ import {
 } from 'react-router-dom'
 
 import { Navbar } from './components/Navbar'
+import { PostsList } from './features/posts/PostsList'
 
 function App() {
   return (
@@ -17,9 +18,9 @@ function App() {
           <Route
             path="/"
             element={
-              <section>
-                <h2>Welcome to the Redux Essentials example app!</h2>
-              </section>
+              <>
+                <PostsList />
+              </>
             }
           ></Route>
         </Routes>
