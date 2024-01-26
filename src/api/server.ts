@@ -3,7 +3,7 @@ import { setupWorker } from 'msw/browser'
 import { factory, oneOf, manyOf, primaryKey } from '@mswjs/data'
 import { nanoid } from '@reduxjs/toolkit'
 import { faker } from '@faker-js/faker'
-import { Server as MockSocketServer } from 'mock-socket'
+import { Server as MockSocketServer, Client } from 'mock-socket'
 
 import { parseISO } from 'date-fns'
 
@@ -14,8 +14,8 @@ const RECENT_NOTIFICATIONS_DAYS = 7
 // Add an extra delay to all endpoints, so loading spinners show up.
 const ARTIFICIAL_DELAY_MS = 2000
 
-function delay(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+function delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 /* RNG setup */
@@ -41,14 +41,20 @@ if (useSeededRNG) {
   faker.seed(seedDate.getTime())
 }
 
-function getRandomInt(min, max) {
+function getRandomInt(min: number, max: number) {
   return faker.number.int({ min, max })
 }
 
-const randomFromArray = (array) => {
+const randomFromArray = <T>(array: T[]) => {
   const index = getRandomInt(0, array.length - 1)
   return array[index]
 }
+
+const firstFromArray = <T>(items: T | T[] | readonly T[]) => {
+  return ([] as T[]).concat(items)[0]
+}
+
+type ReactionName = 'thumbsUp' | 'hooray' | 'heart' | 'rocket' | 'eyes'
 
 /* MSW Data Model Setup */
 
@@ -87,6 +93,14 @@ export const db = factory({
   },
 })
 
+type ModelDB = typeof db
+
+type UserData = ReturnType<typeof createUserData>
+type PostData = ReturnType<typeof createPostData>
+
+type User = ReturnType<typeof db.user.create>
+type Post = ReturnType<typeof db.post.create>
+
 const createUserData = () => {
   const firstName = faker.person.firstName()
   const lastName = faker.person.lastName()
@@ -99,7 +113,7 @@ const createUserData = () => {
   }
 }
 
-const createPostData = (user) => {
+const createPostData = (user: User) => {
   return {
     title: faker.lorem.words(),
     date: faker.date.recent({ days: RECENT_NOTIFICATIONS_DAYS }).toISOString(),
@@ -119,9 +133,9 @@ for (let i = 0; i < NUM_USERS; i++) {
   }
 }
 
-const serializePost = (post) => ({
+const serializePost = (post: Post) => ({
   ...post,
-  user: post.user.id,
+  user: post.user!.id,
 })
 
 /* MSW REST API Handlers */
@@ -133,9 +147,9 @@ export const handlers = [
     return HttpResponse.json(posts)
   }),
   http.post('/fakeApi/posts', async function ({ request }) {
-    const data = await request.json()
+    const data = (await request.json())! as Record<string, unknown>
 
-    if (data.content === 'error') {
+    if ('content' in data && data.content === 'error') {
       await delay(ARTIFICIAL_DELAY_MS)
 
       return new HttpResponse(
@@ -147,8 +161,9 @@ export const handlers = [
     }
 
     data.date = new Date().toISOString()
+    const userId = data.user as string
 
-    const user = db.user.findFirst({ where: { id: { equals: data.user } } })
+    const user = db.user.findFirst({ where: { id: { equals: userId } } })
     data.user = user
     data.reactions = db.reaction.create()
 
@@ -157,47 +172,50 @@ export const handlers = [
     return HttpResponse.json(serializePost(post))
   }),
   http.get('/fakeApi/posts/:postId', async function ({ params }) {
+    const postId = firstFromArray(params.postId)
     const post = db.post.findFirst({
-      where: { id: { equals: params.postId } },
-    })
+      where: { id: { equals: postId } },
+    })!
     await delay(ARTIFICIAL_DELAY_MS)
     return HttpResponse.json(serializePost(post))
   }),
   http.patch('/fakeApi/posts/:postId', async ({ request, params }) => {
-    const { id, ...data } = await request.json()
+    const { id, ...data } = (await request.json()) as Post
+    const postId = firstFromArray(params.postId)
     const updatedPost = db.post.update({
-      where: { id: { equals: params.postId } },
+      where: { id: { equals: postId } },
       data,
-    })
+    })!
     await delay(ARTIFICIAL_DELAY_MS)
     return HttpResponse.json(serializePost(updatedPost))
   }),
 
   http.get('/fakeApi/posts/:postId/comments', async ({ params }) => {
+    const postId = firstFromArray(params.postId)
     const post = db.post.findFirst({
-      where: { id: { equals: params.postId } },
-    })
+      where: { id: { equals: postId } },
+    })!
 
     await delay(ARTIFICIAL_DELAY_MS)
     return HttpResponse.json({ comments: post.comments })
   }),
 
   http.post('/fakeApi/posts/:postId/reactions', async ({ request, params }) => {
-    const postId = params.postId
-    const { reaction } = await request.json()
+    const postId = firstFromArray(params.postId)
+    const { reaction } = (await request.json()) as { reaction: ReactionName }
     const post = db.post.findFirst({
       where: { id: { equals: postId } },
-    })
+    })!
 
     const updatedPost = db.post.update({
       where: { id: { equals: postId } },
       data: {
         reactions: {
-          ...post.reactions,
-          [reaction]: (post.reactions[reaction] += 1),
+          ...post.reactions!,
+          [reaction]: (post.reactions![reaction] += 1),
         },
       },
-    })
+    })!
 
     await delay(ARTIFICIAL_DELAY_MS)
     return HttpResponse.json(serializePost(updatedPost))
@@ -227,15 +245,15 @@ export const worker = setupWorker(...handlers)
 
 const socketServer = new MockSocketServer('ws://localhost')
 
-let currentSocket
+let currentSocket: Client
 
-const sendMessage = (socket, obj) => {
+const sendMessage = (socket: Client, obj: any) => {
   socket.send(JSON.stringify(obj))
 }
 
 // Allow our UI to fake the server pushing out some notifications over the websocket,
 // as if other users were interacting with the system.
-const sendRandomNotifications = (socket, since) => {
+const sendRandomNotifications = (socket: Client, since: string) => {
   const numNotifications = getRandomInt(1, 5)
 
   const notifications = generateRandomNotifications(since, numNotifications, db)
@@ -243,15 +261,15 @@ const sendRandomNotifications = (socket, since) => {
   sendMessage(socket, { type: 'notifications', payload: notifications })
 }
 
-export const forceGenerateNotifications = (since) => {
+export const forceGenerateNotifications = (since: string) => {
   sendRandomNotifications(currentSocket, since)
 }
 
-socketServer.on('connection', (socket) => {
+socketServer.on('connection', socket => {
   currentSocket = socket
 
-  socket.on('message', (data) => {
-    const message = JSON.parse(data)
+  socket.on('message', data => {
+    const message = JSON.parse(data as string)
 
     switch (message.type) {
       case 'notifications': {
@@ -274,9 +292,13 @@ const notificationTemplates = [
   'sent you a gift',
 ]
 
-function generateRandomNotifications(since, numNotifications, db) {
+function generateRandomNotifications(
+  since: string | undefined,
+  numNotifications: number,
+  db: ModelDB,
+) {
   const now = new Date()
-  let pastDate
+  let pastDate: Date
 
   if (since) {
     pastDate = parseISO(since)

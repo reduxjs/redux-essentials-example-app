@@ -1,10 +1,20 @@
 // A tiny wrapper around fetch(), borrowed from
 // https://kentcdodds.com/blog/replace-axios-with-a-simple-custom-fetch-wrapper
 
-export async function client(endpoint, { body, ...customConfig } = {}) {
+interface ClientResponse<T> {
+  status: number
+  data: T
+  headers: Headers
+  url: string
+}
+
+export async function client<T>(
+  endpoint: string,
+  { body, ...customConfig }: Partial<RequestInit> = {},
+): Promise<ClientResponse<T>> {
   const headers = { 'Content-Type': 'application/json' }
 
-  const config = {
+  const config: RequestInit = {
     method: body ? 'POST' : 'GET',
     ...customConfig,
     headers: {
@@ -31,15 +41,22 @@ export async function client(endpoint, { body, ...customConfig } = {}) {
       }
     }
     throw new Error(response.statusText)
-  } catch (err) {
+  } catch (err: any) {
     return Promise.reject(err.message ? err.message : data)
   }
 }
 
-client.get = function (endpoint, customConfig = {}) {
-  return client(endpoint, { ...customConfig, method: 'GET' })
+client.get = function <T>(
+  endpoint: string,
+  customConfig: Partial<RequestInit> = {},
+) {
+  return client<T>(endpoint, { ...customConfig, method: 'GET' })
 }
 
-client.post = function (endpoint, body, customConfig = {}) {
-  return client(endpoint, { ...customConfig, body })
+client.post = function <T>(
+  endpoint: string,
+  body: any,
+  customConfig: Partial<RequestInit> = {},
+) {
+  return client<T>(endpoint, { ...customConfig, body })
 }
