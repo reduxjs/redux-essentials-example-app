@@ -1,15 +1,34 @@
 import { createSlice, nanoid, PayloadAction } from '@reduxjs/toolkit'
 import { sub } from 'date-fns'
 
-interface Post {
+export interface Reactions {
+  thumbsUp: number
+  hooray: number
+  heart: number
+  rocket: number
+  eyes: number
+}
+
+export type ReactionName = keyof Reactions
+
+export interface Post {
   id: string
   title: string
   content: string
   user: string
   date: string
+  reactions: Reactions
 }
 
 type PostUpdate = Pick<Post, 'id' | 'title' | 'content'>
+
+const initialReactions: Reactions = {
+  thumbsUp: 0,
+  hooray: 0,
+  heart: 0,
+  rocket: 0,
+  eyes: 0,
+}
 
 const initialState: Post[] = [
   {
@@ -18,6 +37,7 @@ const initialState: Post[] = [
     content: 'Hello!',
     user: '0',
     date: sub(new Date(), { minutes: 10 }).toISOString(),
+    reactions: initialReactions,
   },
   {
     id: '2',
@@ -25,6 +45,7 @@ const initialState: Post[] = [
     content: 'More text',
     user: '2',
     date: sub(new Date(), { minutes: 5 }).toISOString(),
+    reactions: initialReactions,
   },
 ]
 
@@ -44,6 +65,7 @@ const postsSlice = createSlice({
             title,
             content,
             user: userId,
+            reactions: initialReactions,
           },
         }
       },
