@@ -2,6 +2,7 @@ import React from 'react'
 import { Link, useParams } from 'react-router-dom'
 
 import { useAppSelector } from '@/app/hooks'
+import { TimeAgo } from '@/components/TimeAgo'
 
 import { PostAuthor } from './PostAuthor'
 
@@ -26,6 +27,7 @@ export const SinglePostPage = () => {
         <h2>{post.title}</h2>
         <div>
           <PostAuthor userId={post.user} />
+          <TimeAgo timestamp={post.date} />
         </div>
         <p className="post-content">{post.content}</p>
         <Link to={`/editPost/${post.id}`} className="button">
