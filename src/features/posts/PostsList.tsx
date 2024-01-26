@@ -9,7 +9,12 @@ import { PostAuthor } from './PostAuthor'
 export const PostsList = () => {
   const posts = useAppSelector((state) => state.posts)
 
-  const renderedPosts = posts.map((post) => {
+  // Sort posts in reverse chronological order by datetime string
+  const orderedPosts = posts
+    .slice()
+    .sort((a, b) => b.date.localeCompare(a.date))
+
+  const renderedPosts = orderedPosts.map((post) => {
     return (
       <article className="post-excerpt" key={post.id}>
         <h3>{post.title}</h3>
