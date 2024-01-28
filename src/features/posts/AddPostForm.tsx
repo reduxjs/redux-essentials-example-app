@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 
 import { useAppDispatch, useAppSelector } from '@/app/hooks'
+import { selectAllUsers } from '@/features/users/usersSlice'
+
 import { addNewPost } from './postsSlice'
 
 export const AddPostForm = () => {
@@ -12,7 +14,7 @@ export const AddPostForm = () => {
   )
 
   const dispatch = useAppDispatch()
-  const users = useAppSelector((state) => state.users)
+  const users = useAppSelector(selectAllUsers)
 
   const onTitleChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value)
