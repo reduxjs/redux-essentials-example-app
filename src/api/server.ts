@@ -15,7 +15,7 @@ const RECENT_NOTIFICATIONS_DAYS = 7
 const ARTIFICIAL_DELAY_MS = 2000
 
 function delay(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms))
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 /* RNG setup */
@@ -265,10 +265,10 @@ export const forceGenerateNotifications = (since: string) => {
   sendRandomNotifications(currentSocket, since)
 }
 
-socketServer.on('connection', socket => {
+socketServer.on('connection', (socket) => {
   currentSocket = socket
 
-  socket.on('message', data => {
+  socket.on('message', (data) => {
     const message = JSON.parse(data as string)
 
     switch (message.type) {

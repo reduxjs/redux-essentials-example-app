@@ -4,15 +4,20 @@ import { client } from '@/api/client'
 
 import type { RootState } from '@/app/store'
 
-export interface Notification {
+export interface ServerNotification {
   id: string
   date: string
   message: string
   user: string
 }
 
+export interface Notification extends ServerNotification {
+  read: boolean
+  isNew: boolean
+}
+
 export const fetchNotifications = createAsyncThunk<
-  Notification[],
+  ServerNotification[],
   void,
   {
     state: RootState
@@ -21,7 +26,7 @@ export const fetchNotifications = createAsyncThunk<
   const allNotifications = selectAllNotifications(getState())
   const [latestNotification] = allNotifications
   const latestTimestamp = latestNotification ? latestNotification.date : ''
-  const response = await client.get<Notification[]>(
+  const response = await client.get<ServerNotification[]>(
     `/fakeApi/notifications?since=${latestTimestamp}`,
   )
   return response.data
@@ -32,15 +37,37 @@ const initialState: Notification[] = []
 const notificationsSlice = createSlice({
   name: 'notifications',
   initialState,
-  reducers: {},
+  reducers: {
+    allNotificationsRead(state) {
+      state.forEach((notification) => {
+        notification.read = true
+      })
+    },
+  },
   extraReducers(builder) {
     builder.addCase(fetchNotifications.fulfilled, (state, action) => {
-      state.push(...action.payload)
+      // Add client-side metadata for tracking new notifications
+      const notificationsWithMetadata: Notification[] = action.payload.map(
+        (notification) => ({
+          ...notification,
+          read: false,
+          isNew: true,
+        }),
+      )
+
+      state.forEach((notification) => {
+        // Any notifications we've read are no longer new
+        notification.isNew = !notification.read
+      })
+
+      state.push(...notificationsWithMetadata)
       // Sort with newest first
       state.sort((a, b) => b.date.localeCompare(a.date))
     })
   },
 })
+
+export const { allNotificationsRead } = notificationsSlice.actions
 
 export default notificationsSlice.reducer
 
