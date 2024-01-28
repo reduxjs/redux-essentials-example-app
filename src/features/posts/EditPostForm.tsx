@@ -2,14 +2,20 @@ import React, { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { useAppSelector, useAppDispatch } from '@/app/hooks'
-import { postUpdated } from './postsSlice'
+import { postUpdated, selectPostById } from './postsSlice'
 
 export const EditPostForm = () => {
   const { postId } = useParams()
 
-  const post = useAppSelector(
-    (state) => state.posts.find((post) => post.id === postId)!,
-  )
+  const post = useAppSelector((state) => selectPostById(state, postId!))
+
+  if (!post) {
+    return (
+      <section>
+        <h2>Post not found!</h2>
+      </section>
+    )
+  }
 
   const [title, setTitle] = useState(post.title)
   const [content, setContent] = useState(post.content)
