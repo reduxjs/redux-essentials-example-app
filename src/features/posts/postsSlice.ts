@@ -1,4 +1,10 @@
-import { createSlice, nanoid, PayloadAction } from '@reduxjs/toolkit'
+import {
+  createAsyncThunk,
+  createSlice,
+  nanoid,
+  PayloadAction,
+} from '@reduxjs/toolkit'
+import { client } from '@/api/client'
 
 import type { RootState } from '@/app/store'
 
@@ -36,6 +42,11 @@ const initialReactions: Reactions = {
   rocket: 0,
   eyes: 0,
 }
+
+export const fetchPosts = createAsyncThunk('posts/fetchPosts', async () => {
+  const response = await client.get<Post[]>('/fakeApi/posts')
+  return response.data
+})
 
 const initialState: PostsState = {
   posts: [],

@@ -1,12 +1,13 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
-import { useAppSelector } from '@/app/hooks'
+import { useAppSelector, useAppDispatch } from '@/app/hooks'
 import { TimeAgo } from '@/components/TimeAgo'
+import { Spinner } from '@/components/Spinner'
 
 import { PostAuthor } from './PostAuthor'
 import { ReactionButtons } from './ReactionButtons'
-import { Post, selectAllPosts } from './postsSlice'
+import { Post, selectAllPosts, fetchPosts } from './postsSlice'
 
 const PostExcerpt = ({ post }: { post: Post }) => {
   return (
@@ -27,21 +28,38 @@ const PostExcerpt = ({ post }: { post: Post }) => {
 }
 
 export const PostsList = () => {
+  const dispatch = useAppDispatch()
   const posts = useAppSelector(selectAllPosts)
+  const postStatus = useAppSelector((state) => state.posts.status)
+  const error = useAppSelector((state) => state.posts.error)
 
-  // Sort posts in reverse chronological order by datetime string
-  const orderedPosts = posts
-    .slice()
-    .sort((a, b) => b.date.localeCompare(a.date))
+  useEffect(() => {
+    if (postStatus === 'idle') {
+      dispatch(fetchPosts())
+    }
+  }, [postStatus, dispatch])
 
-  const renderedPosts = orderedPosts.map((post) => (
-    <PostExcerpt key={post.id} post={post} />
-  ))
+  let content: React.ReactNode
+
+  if (postStatus === 'pending') {
+    content = <Spinner text="Loading..." />
+  } else if (postStatus === 'succeeded') {
+    // Sort posts in reverse chronological order by datetime string
+    const orderedPosts = posts
+      .slice()
+      .sort((a, b) => b.date.localeCompare(a.date))
+
+    content = orderedPosts.map((post) => (
+      <PostExcerpt key={post.id} post={post} />
+    ))
+  } else if (postStatus === 'failed') {
+    content = <div>{error}</div>
+  }
 
   return (
     <section className="posts-list">
       <h2>Posts</h2>
-      {renderedPosts}
+      {content}
     </section>
   )
 }
