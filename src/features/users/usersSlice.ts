@@ -1,15 +1,10 @@
-import {
-  createAsyncThunk,
-  createEntityAdapter,
-  createSlice,
-  PayloadAction,
-} from '@reduxjs/toolkit'
+import { createAsyncThunk, createEntityAdapter, createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 import { client } from '@/api/client'
 
 import type { RootState } from '@/app/store'
 
-interface User {
+export interface User {
   id: string
   name: string
 }
@@ -34,5 +29,6 @@ const usersSlice = createSlice({
 
 export default usersSlice.reducer
 
-export const { selectAll: selectAllUsers, selectById: selectUserById } =
-  usersAdapter.getSelectors((state: RootState) => state.users)
+export const { selectAll: selectAllUsers, selectById: selectUserById } = usersAdapter.getSelectors(
+  (state: RootState) => state.users,
+)
