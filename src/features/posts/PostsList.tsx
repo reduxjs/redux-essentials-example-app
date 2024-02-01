@@ -27,13 +27,7 @@ const PostExcerpt = ({ post }: { post: Post }) => {
 }
 
 export const PostsList = () => {
-  const {
-    data: posts = [],
-    isFetching,
-    isSuccess,
-    isError,
-    error,
-  } = useGetPostsQuery()
+  const { data: posts = [], isFetching, isSuccess, isError, error, refetch } = useGetPostsQuery()
 
   const sortedPosts = useMemo(() => {
     const sortedPosts = posts.slice()
@@ -46,9 +40,7 @@ export const PostsList = () => {
   if (isFetching) {
     content = <Spinner text="Loading..." />
   } else if (isSuccess) {
-    content = sortedPosts.map((post) => (
-      <PostExcerpt key={post.id} post={post} />
-    ))
+    content = sortedPosts.map((post) => <PostExcerpt key={post.id} post={post} />)
   } else if (isError) {
     content = <div>{error.toString()}</div>
   }
@@ -56,6 +48,7 @@ export const PostsList = () => {
   return (
     <section className="posts-list">
       <h2>Posts</h2>
+      <button onClick={refetch}>Refetch Posts</button>
       {content}
     </section>
   )
