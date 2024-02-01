@@ -1,4 +1,4 @@
-import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createEntityAdapter, createSelector, EntityState } from '@reduxjs/toolkit'
 
 import type { RootState } from '@/app/store'
 
@@ -9,16 +9,17 @@ export interface User {
   name: string
 }
 
-/* Temporarily ignore adapter - we'll use this again shortly
 const usersAdapter = createEntityAdapter<User>()
 
 const initialState = usersAdapter.getInitialState()
-*/
 
 export const extendedApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getUsers: builder.query<User[], void>({
+    getUsers: builder.query<EntityState<User, string>, void>({
       query: () => '/users',
+      transformResponse: (res: User[]) => {
+        return usersAdapter.setAll(initialState, res)
+      },
     }),
   }),
 })
@@ -31,19 +32,8 @@ export const { useGetUsersQuery } = extendedApiSlice
 // In this case, the users query has no params, so we don't pass anything to select()
 export const selectUsersResult = extendedApiSlice.endpoints.getUsers.select()
 
-const emptyUsers: User[] = []
+export const selectUsersData = createSelector(selectUsersResult, (usersResult) => usersResult.data)
 
-export const selectAllUsers = createSelector(selectUsersResult, (usersResult) => usersResult?.data ?? emptyUsers)
-
-export const selectUserById = createSelector(
-  selectAllUsers,
-  (state: RootState, userId: string) => userId,
-  (users, userId) => users.find((user) => user.id === userId),
-)
-
-/* Temporarily ignore selectors - we'll come back to this later
 export const { selectAll: selectAllUsers, selectById: selectUserById } = usersAdapter.getSelectors(
-  (state: RootState) => state.users,
+  (state: RootState) => selectUsersData(state) ?? initialState,
 )
-
-*/
