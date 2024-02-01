@@ -27,7 +27,7 @@ const PostExcerpt = ({ post }: { post: Post }) => {
 }
 
 export const PostsList = () => {
-  const { data: posts = [], isFetching, isSuccess, isError, error, refetch } = useGetPostsQuery()
+  const { data: posts = [], isLoading, isFetching, isSuccess, isError, error, refetch } = useGetPostsQuery()
 
   const sortedPosts = useMemo(() => {
     const sortedPosts = posts.slice()
@@ -37,7 +37,7 @@ export const PostsList = () => {
 
   let content: React.ReactNode
 
-  if (isFetching) {
+  if (isLoading) {
     content = <Spinner text="Loading..." />
   } else if (isSuccess) {
     content = sortedPosts.map((post) => <PostExcerpt key={post.id} post={post} />)
