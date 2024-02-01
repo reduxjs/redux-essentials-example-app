@@ -1,11 +1,8 @@
 import React, { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
-import { useAppSelector, useAppDispatch } from '@/app/hooks'
 import { Spinner } from '@/components/Spinner'
 import { useGetPostQuery, useEditPostMutation } from '@/features/api/apiSlice'
-
-import { postUpdated, selectPostById } from './postsSlice'
 
 export const EditPostForm = () => {
   const { postId } = useParams()

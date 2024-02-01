@@ -1,8 +1,6 @@
 import React from 'react'
 
-import { useAddReactionMutation } from '@/features/api/apiSlice'
-
-import type { Post, ReactionName } from './postsSlice'
+import { useAddReactionMutation, Post, ReactionName } from '@/features/api/apiSlice'
 
 const reactionEmoji: Record<ReactionName, string> = {
   thumbsUp: '👍',
