@@ -4,7 +4,7 @@ import { Provider } from 'react-redux'
 
 import App from './App'
 import { store } from './app/store'
-import { apiSlice } from './features/api/apiSlice'
+import { extendedApiSlice } from './features/users/usersSlice'
 
 import { worker } from './api/server'
 
@@ -15,7 +15,7 @@ async function start() {
   // Start our mock API server
   await worker.start({ onUnhandledRequest: 'bypass' })
 
-  store.dispatch(apiSlice.endpoints.getUsers.initiate())
+  store.dispatch(extendedApiSlice.endpoints.getUsers.initiate())
 
   const root = createRoot(document.getElementById('root')!)
 
