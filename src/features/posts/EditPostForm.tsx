@@ -2,25 +2,21 @@ import React, { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { useAppSelector, useAppDispatch } from '@/app/hooks'
+import { Spinner } from '@/components/Spinner'
+import { useGetPostQuery, useEditPostMutation } from '@/features/api/apiSlice'
+
 import { postUpdated, selectPostById } from './postsSlice'
 
 export const EditPostForm = () => {
   const { postId } = useParams()
 
-  const post = useAppSelector((state) => selectPostById(state, postId!))
+  const { data: post } = useGetPostQuery(postId!)
 
-  if (!post) {
-    return (
-      <section>
-        <h2>Post not found!</h2>
-      </section>
-    )
-  }
+  const [updatePost, { isLoading }] = useEditPostMutation()
 
-  const [title, setTitle] = useState(post.title)
-  const [content, setContent] = useState(post.content)
+  const [title, setTitle] = useState(post?.title ?? '')
+  const [content, setContent] = useState(post?.content ?? '')
 
-  const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
   const onTitleChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,12 +27,14 @@ export const EditPostForm = () => {
     setContent(e.target.value)
   }
 
-  const onSavePostClicked = () => {
-    if (title && content) {
-      dispatch(postUpdated({ id: post.id, title, content }))
+  const onSavePostClicked = async () => {
+    if (title && content && post) {
+      await updatePost({ id: post.id, title, content })
       navigate(`/posts/${postId}`)
     }
   }
+
+  const spinner = isLoading ? <Spinner text="Saving..." /> : null
 
   return (
     <section>
@@ -50,6 +48,7 @@ export const EditPostForm = () => {
           placeholder="What's on your mind?"
           value={title}
           onChange={onTitleChanged}
+          disabled={isLoading}
         />
         <label htmlFor="postContent">Content:</label>
         <textarea
@@ -57,11 +56,13 @@ export const EditPostForm = () => {
           name="postContent"
           value={content}
           onChange={onContentChanged}
+          disabled={isLoading}
         />
       </form>
       <button type="button" onClick={onSavePostClicked}>
         Save Post
       </button>
+      {spinner}
     </section>
   )
 }
