@@ -1,17 +1,14 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
 
-import { useAppSelector, useAppDispatch } from '@/app/hooks'
+import { useGetPostsQuery, Post } from '@/features/api/apiSlice'
 import { TimeAgo } from '@/components/TimeAgo'
 import { Spinner } from '@/components/Spinner'
 
 import { PostAuthor } from './PostAuthor'
 import { ReactionButtons } from './ReactionButtons'
-import { fetchPosts, selectPostById, selectPostIds } from './postsSlice'
 
-const PostExcerpt = ({ postId }: { postId: string }) => {
-  const post = useAppSelector((state) => selectPostById(state, postId))
-
+const PostExcerpt = ({ post }: { post: Post }) => {
   return (
     <article className="post-excerpt" key={post.id}>
       <h3>{post.title}</h3>
@@ -30,27 +27,22 @@ const PostExcerpt = ({ postId }: { postId: string }) => {
 }
 
 export const PostsList = () => {
-  const dispatch = useAppDispatch()
-  const orderedPostIds = useAppSelector(selectPostIds)
-  const postStatus = useAppSelector((state) => state.posts.status)
-  const error = useAppSelector((state) => state.posts.error)
-
-  useEffect(() => {
-    if (postStatus === 'idle') {
-      dispatch(fetchPosts())
-    }
-  }, [postStatus, dispatch])
+  const {
+    data: posts,
+    isFetching,
+    isSuccess,
+    isError,
+    error,
+  } = useGetPostsQuery()
 
   let content: React.ReactNode
 
-  if (postStatus === 'pending') {
+  if (isFetching) {
     content = <Spinner text="Loading..." />
-  } else if (postStatus === 'succeeded') {
-    content = orderedPostIds.map((postId) => (
-      <PostExcerpt key={postId} postId={postId} />
-    ))
-  } else if (postStatus === 'failed') {
-    content = <div>{error}</div>
+  } else if (isSuccess) {
+    content = posts.map((post) => <PostExcerpt key={post.id} post={post} />)
+  } else if (isError) {
+    content = <div>{error.toString()}</div>
   }
 
   return (
