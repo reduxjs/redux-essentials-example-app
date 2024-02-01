@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react'
 import { Link } from 'react-router-dom'
+import classnames from 'classnames'
 
 import { useGetPostsQuery, Post } from '@/features/api/apiSlice'
 import { TimeAgo } from '@/components/TimeAgo'
@@ -40,7 +41,13 @@ export const PostsList = () => {
   if (isLoading) {
     content = <Spinner text="Loading..." />
   } else if (isSuccess) {
-    content = sortedPosts.map((post) => <PostExcerpt key={post.id} post={post} />)
+    const renderedPosts = sortedPosts.map((post) => <PostExcerpt key={post.id} post={post} />)
+
+    const containerClassname = classnames('posts-container', {
+      disabled: isFetching,
+    })
+
+    content = <div className={containerClassname}>{renderedPosts}</div>
   } else if (isError) {
     content = <div>{error.toString()}</div>
   }
