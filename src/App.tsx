@@ -1,10 +1,6 @@
 import React from 'react'
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  Navigate,
-} from 'react-router-dom'
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'
+import { ToastContainer } from 'react-tiny-toast'
 
 import { Navbar } from './components/Navbar'
 import { PostsList } from './features/posts/PostsList'
@@ -31,6 +27,7 @@ function App() {
           <Route path="/posts/:postId" element={<SinglePostPage />} />
           <Route path="/editPost/:postId" element={<EditPostForm />} />
         </Routes>
+        <ToastContainer />
       </div>
     </Router>
   )
