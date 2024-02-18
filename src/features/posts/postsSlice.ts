@@ -1,6 +1,8 @@
 import { createSlice, nanoid, PayloadAction } from '@reduxjs/toolkit'
 import { sub } from 'date-fns'
 
+import { userLoggedOut } from '@/features/auth/authSlice'
+
 export interface Reactions {
   thumbsUp: number
   hooray: number
@@ -78,16 +80,19 @@ const postsSlice = createSlice({
         existingPost.content = content
       }
     },
-    reactionAdded(
-      state,
-      action: PayloadAction<{ postId: string; reaction: ReactionName }>,
-    ) {
+    reactionAdded(state, action: PayloadAction<{ postId: string; reaction: ReactionName }>) {
       const { postId, reaction } = action.payload
       const existingPost = state.find((post) => post.id === postId)
       if (existingPost) {
         existingPost.reactions[reaction]++
       }
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(userLoggedOut, (state) => {
+      // Clear out the list of posts whenever the user logs out
+      return []
+    })
   },
 })
 
