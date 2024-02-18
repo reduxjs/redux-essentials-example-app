@@ -13,7 +13,8 @@
     "react": "^18",
     "react-dom": "^18",
     "react-redux": "^9",
-    "react-router-dom": "^6"
+    "react-router-dom": "^6",
+    "react-tiny-toast": "^2.0.1"
   },
   "scripts": {
     "dev": "vite",
