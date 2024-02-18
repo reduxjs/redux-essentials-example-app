@@ -1,6 +1,7 @@
 import { createSlice, nanoid, PayloadAction } from '@reduxjs/toolkit'
 import { sub } from 'date-fns'
 
+import { AppStartListening } from '@/app/listenerMiddleware'
 import { userLoggedOut } from '@/features/auth/authSlice'
 
 export interface Reactions {
@@ -99,3 +100,21 @@ const postsSlice = createSlice({
 export const { postAdded, postUpdated, reactionAdded } = postsSlice.actions
 
 export default postsSlice.reducer
+
+export const addPostsListeners = (startListening: AppStartListening) => {
+  startListening({
+    actionCreator: postAdded,
+    effect: async (action, listenerApi) => {
+      const { toast } = await import('react-tiny-toast')
+
+      const toastId = toast.show('New post added!', {
+        variant: 'success',
+        position: 'bottom-right',
+        pause: true,
+      })
+
+      await listenerApi.delay(2000)
+      toast.remove(toastId)
+    },
+  })
+}
