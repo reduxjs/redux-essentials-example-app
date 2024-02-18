@@ -2,10 +2,12 @@ import React, { useState } from 'react'
 
 import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import { userLoggedIn } from './authSlice'
+import { useNavigate } from 'react-router-dom'
 
 export const LoginPage = () => {
   const dispatch = useAppDispatch()
   const users = useAppSelector((state) => state.users)
+  const navigate = useNavigate()
 
   const [userId, setUserId] = useState('')
 
@@ -16,6 +18,7 @@ export const LoginPage = () => {
   const onLogInClicked = () => {
     if (userId) {
       dispatch(userLoggedIn(userId))
+      navigate('/posts')
     }
   }
 
@@ -27,7 +30,8 @@ export const LoginPage = () => {
 
   return (
     <section>
-      <h2>Log In</h2>
+      <h2>Welcome to Tweeter!</h2>
+      <h3>Please log in:</h3>
       <form>
         <label htmlFor="postAuthor">User:</label>
         <select id="postAuthor" value={userId} onChange={onUserChanged}>
