@@ -20,6 +20,11 @@ p {
   font-size: 1.1rem;
 }
 
+.button.small {
+  padding: 0.4rem 0.75rem;
+  margin: 0.25rem;
+}
+
 /* Navbar */
 
 nav {
@@ -72,6 +77,11 @@ nav a:hover {
   margin-left: 5px;
   position: relative;
   top: -3px;
+}
+
+.navContent .userDetails {
+  display: flex;
+  align-items: center;
 }
 
 .badge {
