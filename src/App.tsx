@@ -37,26 +37,14 @@ function App() {
         <Routes>
           <Route path="/" element={<LoginPage />} />
           <Route
-            path="/posts"
+            path="/*"
             element={
               <ProtectedRoute>
-                <Posts />
-              </ProtectedRoute>
-            }
-          ></Route>
-          <Route
-            path="/posts/:postId"
-            element={
-              <ProtectedRoute>
-                <SinglePostPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/editPost/:postId"
-            element={
-              <ProtectedRoute>
-                <EditPostForm />
+                <Routes>
+                  <Route path="/posts" element={<Posts />} />
+                  <Route path="/posts/:postId" element={<SinglePostPage />} />
+                  <Route path="/editPost/:postId" element={<EditPostForm />} />
+                </Routes>
               </ProtectedRoute>
             }
           />
