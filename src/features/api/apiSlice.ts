@@ -41,7 +41,34 @@ export const apiSlice = createApi({
         // so that a user can't do the same reaction more than once
         body: { reaction },
       }),
-      invalidatesTags: (result, error, arg) => [{ type: 'Post', id: arg.postId }],
+      async onQueryStarted({ postId, reaction }, lifecycleApi) {
+        // `updateQueryData` requires the endpoint name and cache key arguments,
+        // so it knows which piece of cache state to update
+        const getPostsPatchResult = lifecycleApi.dispatch(
+          apiSlice.util.updateQueryData('getPosts', undefined, (draft) => {
+            // The `draft` is Immer-wrapped and can be "mutated" like in createSlice
+            const post = draft.find((post) => post.id === postId)
+            if (post) {
+              post.reactions[reaction]++
+            }
+          }),
+        )
+
+        // We also have another copy of the same data in the `getPost` cache
+        // entry for this post ID, so we need to update that as well
+        const getPostPatchResult = lifecycleApi.dispatch(
+          apiSlice.util.updateQueryData('getPost', postId, (draft) => {
+            draft.reactions[reaction]++
+          }),
+        )
+
+        try {
+          await lifecycleApi.queryFulfilled
+        } catch {
+          getPostsPatchResult.undo()
+          getPostPatchResult.undo()
+        }
+      },
     }),
   }),
 })
