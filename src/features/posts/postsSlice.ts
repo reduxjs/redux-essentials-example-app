@@ -5,6 +5,7 @@ import type { RootState } from '@/app/store'
 import { AppStartListening } from '@/app/listenerMiddleware'
 import { createAppAsyncThunk } from '@/app/withTypes'
 
+import { apiSlice } from '@/features/api/apiSlice'
 import { logout } from '@/features/auth/authSlice'
 
 export interface Reactions {
@@ -123,7 +124,7 @@ export const selectPostsError = (state: RootState) => state.posts.error
 
 export const addPostsListeners = (startAppListening: AppStartListening) => {
   startAppListening({
-    actionCreator: addNewPost.fulfilled,
+    matcher: apiSlice.endpoints.addNewPost.matchFulfilled,
     effect: async (action, listenerApi) => {
       const { toast } = await import('react-tiny-toast')
 
