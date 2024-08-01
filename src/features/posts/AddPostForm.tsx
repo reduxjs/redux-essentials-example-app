@@ -1,5 +1,9 @@
 import React from 'react'
+import { nanoid } from '@reduxjs/toolkit'
+
 import { useAppDispatch } from '@/app/hooks'
+
+import { type Post, postAdded } from './postsSlice'
 
 // TS types for the input fields
 // See: https://epicreact.dev/how-to-type-a-react-form-on-submit-handler/
@@ -12,6 +16,8 @@ interface AddPostFormElements extends HTMLFormElement {
 }
 
 export const AddPostForm = () => {
+  const dispatch = useAppDispatch()
+
   const handleSubmit = (e: React.SubmitEvent<AddPostFormElements>) => {
     // Prevent server submission
     e.preventDefault()
@@ -20,7 +26,12 @@ export const AddPostForm = () => {
     const title = elements.postTitle.value
     const content = elements.postContent.value
 
-    console.log('Values: ', { title, content })
+    const newPost: Post = {
+      id: nanoid(),
+      title,
+      content,
+    }
+    dispatch(postAdded(newPost))
 
     e.currentTarget.reset()
   }
