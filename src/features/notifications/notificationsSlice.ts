@@ -5,6 +5,8 @@ import { client } from '@/api/client'
 import type { RootState } from '@/app/store'
 import { createAppAsyncThunk } from '@/app/withTypes'
 
+import { apiSlice } from '@/features/api/apiSlice'
+
 export interface ServerNotification {
   id: string
   date: string
@@ -25,6 +27,16 @@ export const fetchNotifications = createAppAsyncThunk('notifications/fetchNotifi
 
   return response.data
 })
+
+export const apiSliceWithNotifications = apiSlice.injectEndpoints({
+  endpoints: (builder) => ({
+    getNotifications: builder.query<ServerNotification[], void>({
+      query: () => '/notifications',
+    }),
+  }),
+})
+
+export const { useGetNotificationsQuery } = apiSliceWithNotifications
 
 const notificationsAdapter = createEntityAdapter<ClientNotification>({
   // Sort with newest first
