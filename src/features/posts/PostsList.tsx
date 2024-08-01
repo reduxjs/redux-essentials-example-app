@@ -8,14 +8,15 @@ import { TimeAgo } from '@/components/TimeAgo'
 
 import { PostAuthor } from './PostAuthor'
 
-import { Post, fetchPosts, selectAllPosts, selectPostsError, selectPostsStatus } from './postsSlice'
+import { fetchPosts, selectPostById, selectPostIds, selectPostsStatus, selectPostsError } from './postsSlice'
 import { ReactionButtons } from './ReactionButtons'
 
 interface PostExcerptProps {
-  post: Post
+  postId: string
 }
 
-function PostExcerpt({ post }: PostExcerptProps) {
+function PostExcerpt({ postId }: PostExcerptProps) {
+  const post = useAppSelector((state) => selectPostById(state, postId))
   return (
     <article className="post-excerpt" key={post.id}>
       <h3>
@@ -33,7 +34,7 @@ function PostExcerpt({ post }: PostExcerptProps) {
 
 export const PostsList = () => {
   const dispatch = useAppDispatch()
-  const posts = useAppSelector(selectAllPosts)
+  const orderedPostIds = useAppSelector(selectPostIds)
   const postStatus = useAppSelector(selectPostsStatus)
   const postsError = useAppSelector(selectPostsError)
 
@@ -48,10 +49,7 @@ export const PostsList = () => {
   if (postStatus === 'pending') {
     content = <Spinner text="Loading..." />
   } else if (postStatus === 'succeeded') {
-    // Sort posts in reverse chronological order by datetime string
-    const orderedPosts = posts.slice().sort((a, b) => b.date.localeCompare(a.date))
-
-    content = orderedPosts.map((post) => <PostExcerpt key={post.id} post={post} />)
+    content = orderedPostIds.map((postId) => <PostExcerpt key={postId} postId={postId} />)
   } else if (postStatus === 'rejected') {
     content = <div>{postsError}</div>
   }
