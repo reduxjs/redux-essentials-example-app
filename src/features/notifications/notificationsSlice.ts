@@ -1,4 +1,4 @@
-import { createEntityAdapter, createSlice, createSelector } from '@reduxjs/toolkit'
+import { createEntityAdapter, createSlice, createSelector, createAction, isAnyOf } from '@reduxjs/toolkit'
 
 import { forceGenerateNotifications } from '@/api/server'
 import type { AppThunk, RootState } from '@/app/store'
@@ -19,15 +19,61 @@ export interface NotificationMetadata {
   isNew: boolean
 }
 
+const notificationsReceived = createAction<ServerNotification[]>('notifications/notificationsReceived')
+
 export const apiSliceWithNotifications = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getNotifications: builder.query<ServerNotification[], void>({
       query: () => '/notifications',
+      async onCacheEntryAdded(arg, lifecycleApi) {
+        // create a websocket connection when the cache subscription starts
+        const ws = new WebSocket('ws://localhost')
+        try {
+          // wait for the initial query to resolve before proceeding
+          await lifecycleApi.cacheDataLoaded
+
+          // when data is received from the socket connection to the server,
+          // update our query result with the received message
+          const listener = (event: MessageEvent<string>) => {
+            const message: { type: 'notifications'; payload: ServerNotification[] } = JSON.parse(event.data)
+            switch (message.type) {
+              case 'notifications': {
+                lifecycleApi.updateCachedData((draft) => {
+                  // Insert all received notifications from the websocket
+                  // into the existing RTKQ cache array
+                  draft.push(...message.payload)
+                  draft.sort((a, b) => b.date.localeCompare(a.date))
+                })
+
+                // Dispatch an additional action so we can track "read" state
+                lifecycleApi.dispatch(notificationsReceived(message.payload))
+                break
+              }
+              default:
+                break
+            }
+          }
+
+          ws.addEventListener('message', listener)
+        } catch {
+          // no-op in case `cacheEntryRemoved` resolves before `cacheDataLoaded`,
+          // in which case `cacheDataLoaded` will throw
+        }
+        // cacheEntryRemoved will resolve when the cache subscription is no longer active
+        await lifecycleApi.cacheEntryRemoved
+        // perform cleanup steps once the `cacheEntryRemoved` promise resolves
+        ws.close()
+      },
     }),
   }),
 })
 
 export const { useGetNotificationsQuery } = apiSliceWithNotifications
+
+const matchNotificationsReceived = isAnyOf(
+  notificationsReceived,
+  apiSliceWithNotifications.endpoints.getNotifications.matchFulfilled,
+)
 
 export const fetchNotificationsWebsocket = (): AppThunk => (dispatch, getState) => {
   const allNotifications = selectNotificationsData(getState())
@@ -61,7 +107,7 @@ const notificationsSlice = createSlice({
     },
   },
   extraReducers(builder) {
-    builder.addMatcher(apiSliceWithNotifications.endpoints.getNotifications.matchFulfilled, (state, action) => {
+    builder.addMatcher(matchNotificationsReceived, (state, action) => {
       // Add client-side metadata for tracking new notifications
       const notificationsMetadata: NotificationMetadata[] = action.payload.map((notification) => ({
         id: notification.id,
