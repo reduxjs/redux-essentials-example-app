@@ -14,17 +14,15 @@ export interface ServerNotification {
   user: string
 }
 
-export interface ClientNotification extends ServerNotification {
+// Replaces `ClientNotification`, since we just need these fields
+export interface NotificationMetadata {
+  id: string
   read: boolean
   isNew: boolean
 }
 
 export const fetchNotifications = createAppAsyncThunk('notifications/fetchNotifications', async (_unused, thunkApi) => {
-  const allNotifications = selectAllNotifications(thunkApi.getState())
-  const [latestNotification] = allNotifications
-  const latestTimestamp = latestNotification ? latestNotification.date : ''
-  const response = await client.get<ServerNotification[]>(`/fakeApi/notifications?since=${latestTimestamp}`)
-
+  const response = await client.get<ServerNotification[]>(`/fakeApi/notifications`)
   return response.data
 })
 
@@ -38,38 +36,35 @@ export const apiSliceWithNotifications = apiSlice.injectEndpoints({
 
 export const { useGetNotificationsQuery } = apiSliceWithNotifications
 
-const notificationsAdapter = createEntityAdapter<ClientNotification>({
-  // Sort with newest first
-  sortComparer: (a, b) => b.date.localeCompare(a.date),
-})
+const metadataAdapter = createEntityAdapter<NotificationMetadata>()
 
-const initialState = notificationsAdapter.getInitialState()
+const initialState = metadataAdapter.getInitialState()
 
 const notificationsSlice = createSlice({
   name: 'notifications',
   initialState,
   reducers: {
     allNotificationsRead(state) {
-      Object.values(state.entities).forEach((notification) => {
-        notification.read = true
+      Object.values(state.entities).forEach((metadata) => {
+        metadata.read = true
       })
     },
   },
   extraReducers(builder) {
-    builder.addCase(fetchNotifications.fulfilled, (state, action) => {
+    builder.addMatcher(apiSliceWithNotifications.endpoints.getNotifications.matchFulfilled, (state, action) => {
       // Add client-side metadata for tracking new notifications
-      const notificationsWithMetadata: ClientNotification[] = action.payload.map((notification) => ({
-        ...notification,
+      const notificationsMetadata: NotificationMetadata[] = action.payload.map((notification) => ({
+        id: notification.id,
         read: false,
         isNew: true,
       }))
 
-      Object.values(state.entities).forEach((notification) => {
+      Object.values(state.entities).forEach((metadata) => {
         // Any notifications we've read are no longer new
-        notification.isNew = !notification.read
+        metadata.isNew = !metadata.read
       })
 
-      notificationsAdapter.upsertMany(state, notificationsWithMetadata)
+      metadataAdapter.upsertMany(state, notificationsMetadata)
     })
   },
 })
@@ -78,12 +73,11 @@ export const { allNotificationsRead } = notificationsSlice.actions
 
 export default notificationsSlice.reducer
 
-export const { selectAll: selectAllNotifications } = notificationsAdapter.getSelectors(
-  (state: RootState) => state.notifications,
-)
+export const { selectAll: selectAllNotificationsMetadata, selectEntities: selectMetadataEntities } =
+  metadataAdapter.getSelectors((state: RootState) => state.notifications)
 
 export const selectUnreadNotificationsCount = (state: RootState) => {
-  const allNotifications = selectAllNotifications(state)
-  const unreadNotifications = allNotifications.filter((notification) => !notification.read)
+  const allMetadata = selectAllNotificationsMetadata(state)
+  const unreadNotifications = allMetadata.filter((metadata) => !metadata.read)
   return unreadNotifications.length
 }
