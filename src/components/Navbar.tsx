@@ -6,6 +6,7 @@ import { logout } from '@/features/auth/authSlice'
 import {
   fetchNotificationsWebsocket,
   selectUnreadNotificationsCount,
+  useGetNotificationsQuery,
 } from '@/features/notifications/notificationsSlice'
 import { selectCurrentUser } from '@/features/users/usersSlice'
 
@@ -14,6 +15,9 @@ import { UserIcon } from './UserIcon'
 export const Navbar = () => {
   const dispatch = useAppDispatch()
   const user = useAppSelector(selectCurrentUser)
+
+  // Trigger initial fetch of notifications and keep the websocket open to receive updates
+  useGetNotificationsQuery()
 
   const numUnreadNotifications = useAppSelector(selectUnreadNotificationsCount)
 
