@@ -1,22 +1,19 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
-
-import { useAppSelector, useAppDispatch } from '@/app/hooks'
 
 import { Spinner } from '@/components/Spinner'
 import { TimeAgo } from '@/components/TimeAgo'
 
-import { PostAuthor } from './PostAuthor'
+import { useGetPostsQuery, Post } from '@/features/api/apiSlice'
 
-import { fetchPosts, selectPostById, selectPostIds, selectPostsStatus, selectPostsError } from './postsSlice'
+import { PostAuthor } from './PostAuthor'
 import { ReactionButtons } from './ReactionButtons'
 
 interface PostExcerptProps {
-  postId: string
+  post: Post
 }
 
-function PostExcerpt({ postId }: PostExcerptProps) {
-  const post = useAppSelector((state) => selectPostById(state, postId))
+function PostExcerpt({ post }: PostExcerptProps) {
   return (
     <article className="post-excerpt" key={post.id}>
       <h3>
@@ -33,25 +30,16 @@ function PostExcerpt({ postId }: PostExcerptProps) {
 }
 
 export const PostsList = () => {
-  const dispatch = useAppDispatch()
-  const orderedPostIds = useAppSelector(selectPostIds)
-  const postStatus = useAppSelector(selectPostsStatus)
-  const postsError = useAppSelector(selectPostsError)
-
-  useEffect(() => {
-    if (postStatus === 'idle') {
-      dispatch(fetchPosts())
-    }
-  }, [postStatus, dispatch])
+  const { data: posts = [], isLoading, isSuccess, isError, error } = useGetPostsQuery()
 
   let content: React.ReactNode
 
-  if (postStatus === 'pending') {
+  if (isLoading) {
     content = <Spinner text="Loading..." />
-  } else if (postStatus === 'succeeded') {
-    content = orderedPostIds.map((postId) => <PostExcerpt key={postId} postId={postId} />)
-  } else if (postStatus === 'rejected') {
-    content = <div>{postsError}</div>
+  } else if (isSuccess) {
+    content = posts.map((post) => <PostExcerpt key={post.id} post={post} />)
+  } else if (isError) {
+    content = <div>{error.toString()}</div>
   }
 
   return (
