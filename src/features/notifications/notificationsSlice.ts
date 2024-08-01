@@ -1,9 +1,7 @@
-import { createEntityAdapter, createSlice } from '@reduxjs/toolkit'
+import { createEntityAdapter, createSlice, createSelector } from '@reduxjs/toolkit'
 
-import { client } from '@/api/client'
-
-import type { RootState } from '@/app/store'
-import { createAppAsyncThunk } from '@/app/withTypes'
+import { forceGenerateNotifications } from '@/api/server'
+import type { AppThunk, RootState } from '@/app/store'
 
 import { apiSlice } from '@/features/api/apiSlice'
 
@@ -21,11 +19,6 @@ export interface NotificationMetadata {
   isNew: boolean
 }
 
-export const fetchNotifications = createAppAsyncThunk('notifications/fetchNotifications', async (_unused, thunkApi) => {
-  const response = await client.get<ServerNotification[]>(`/fakeApi/notifications`)
-  return response.data
-})
-
 export const apiSliceWithNotifications = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getNotifications: builder.query<ServerNotification[], void>({
@@ -35,6 +28,23 @@ export const apiSliceWithNotifications = apiSlice.injectEndpoints({
 })
 
 export const { useGetNotificationsQuery } = apiSliceWithNotifications
+
+export const fetchNotificationsWebsocket = (): AppThunk => (dispatch, getState) => {
+  const allNotifications = selectNotificationsData(getState())
+  const [latestNotification] = allNotifications
+  const latestTimestamp = latestNotification?.date ?? ''
+  // Hardcode a call to the mock server to simulate a server push scenario over websockets
+  forceGenerateNotifications(latestTimestamp)
+}
+
+const emptyNotifications: ServerNotification[] = []
+
+export const selectNotificationsResult = apiSliceWithNotifications.endpoints.getNotifications.select()
+
+const selectNotificationsData = createSelector(
+  selectNotificationsResult,
+  (notificationsResult) => notificationsResult.data ?? emptyNotifications,
+)
 
 const metadataAdapter = createEntityAdapter<NotificationMetadata>()
 
