@@ -5,6 +5,7 @@ import { TimeAgo } from '@/components/TimeAgo'
 
 import { PostAuthor } from './PostAuthor'
 import { selectAllPosts } from './postsSlice'
+import { ReactionButtons } from './ReactionButtons'
 
 export const PostsList = () => {
   const posts = useAppSelector(selectAllPosts)
@@ -22,6 +23,7 @@ export const PostsList = () => {
         <TimeAgo timestamp={post.date} />
       </div>
       <p className="post-content">{post.content.substring(0, 100)}</p>
+      <ReactionButtons post={post} />
     </article>
   ))
 
