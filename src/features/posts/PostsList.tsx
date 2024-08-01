@@ -1,8 +1,11 @@
 import { Link } from 'react-router-dom'
+
 import { useAppSelector } from '@/app/hooks'
 
+import { selectAllPosts } from './postsSlice'
+
 export const PostsList = () => {
-  const posts = useAppSelector((state) => state.posts)
+  const posts = useAppSelector(selectAllPosts)
 
   const renderedPosts = posts.map((post) => (
     <article className="post-excerpt" key={post.id}>
