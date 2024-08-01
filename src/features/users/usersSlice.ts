@@ -7,7 +7,7 @@ import { createAppAsyncThunk } from '@/app/withTypes'
 
 import { selectCurrentUsername } from '@/features/auth/authSlice'
 
-interface User {
+export interface User {
   id: string
   name: string
 }
