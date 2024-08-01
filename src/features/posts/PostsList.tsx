@@ -31,7 +31,7 @@ function PostExcerpt({ post }: PostExcerptProps) {
 }
 
 export const PostsList = () => {
-  const { data: posts = [], isLoading, isFetching, isSuccess, isError, error, refetch } = useGetPostsQuery()
+  const { data: posts = [], isLoading, isFetching, isSuccess, isError, error } = useGetPostsQuery()
 
   const sortedPosts = useMemo(() => {
     const sortedPosts = posts.slice()
@@ -58,7 +58,6 @@ export const PostsList = () => {
   return (
     <section className="posts-list">
       <h2>Posts</h2>
-      <button onClick={refetch}>Refetch Posts</button>
       {content}
     </section>
   )
