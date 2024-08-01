@@ -26,8 +26,8 @@ export interface Post {
   reactions: Reactions
 }
 
-type PostUpdate = Pick<Post, 'id' | 'title' | 'content'>
-type NewPost = Pick<Post, 'title' | 'content' | 'user'>
+export type PostUpdate = Pick<Post, 'id' | 'title' | 'content'>
+export type NewPost = Pick<Post, 'title' | 'content' | 'user'>
 
 export const fetchPosts = createAppAsyncThunk(
   'posts/fetchPosts',
