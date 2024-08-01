@@ -3,6 +3,8 @@ import { sub } from 'date-fns'
 
 import type { RootState } from '@/app/store'
 
+import { userLoggedOut } from '@/features/auth/authSlice'
+
 export interface Reactions {
   thumbsUp: number
   tada: number
@@ -87,6 +89,12 @@ const postsSlice = createSlice({
         existingPost.reactions[reaction]++
       }
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(userLoggedOut, (state) => {
+      // Clear out the list of posts whenever the user logs out
+      return []
+    })
   },
 })
 
