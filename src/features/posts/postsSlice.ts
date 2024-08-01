@@ -1,6 +1,8 @@
 import { createSlice, nanoid, PayloadAction } from '@reduxjs/toolkit'
+import { client } from '@/api/client'
 
 import type { RootState } from '@/app/store'
+import { createAppAsyncThunk } from '@/app/withTypes'
 
 import { userLoggedOut } from '@/features/auth/authSlice'
 
@@ -27,7 +29,7 @@ type PostUpdate = Pick<Post, 'id' | 'title' | 'content'>
 
 interface PostsState {
   posts: Post[]
-  status: 'idle' | 'pending' | 'failed' | 'succeeded'
+  status: 'idle' | 'pending' | 'succeeded' | 'rejected'
   error: string | null
 }
 
@@ -38,6 +40,11 @@ const initialReactions: Reactions = {
   rocket: 0,
   eyes: 0,
 }
+
+export const fetchPosts = createAppAsyncThunk('posts/fetchPosts', async () => {
+  const response = await client.get<Post[]>('/fakeApi/posts')
+  return response.data
+})
 
 const initialState: PostsState = {
   posts: [],
@@ -83,10 +90,23 @@ const postsSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(userLoggedOut, (state) => {
-      // Clear out the list of posts whenever the user logs out
-      return initialState
-    })
+    builder
+      .addCase(userLoggedOut, (state) => {
+        // Clear out the list of posts whenever the user logs out
+        return initialState
+      })
+      .addCase(fetchPosts.pending, (state, action) => {
+        state.status = 'pending'
+      })
+      .addCase(fetchPosts.fulfilled, (state, action) => {
+        state.status = 'succeeded'
+        // Add any fetched posts to the array
+        state.posts.push(...action.payload)
+      })
+      .addCase(fetchPosts.rejected, (state, action) => {
+        state.status = 'rejected'
+        state.error = action.error.message ?? 'Unknown Error'
+      })
   },
 })
 
