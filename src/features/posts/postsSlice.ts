@@ -70,11 +70,7 @@ const postsSlice = createSlice({
   reducers: {
     postUpdated(state, action: PayloadAction<PostUpdate>) {
       const { id, title, content } = action.payload
-      const existingPost = state.entities[id]
-      if (existingPost) {
-        existingPost.title = title
-        existingPost.content = content
-      }
+      postsAdapter.updateOne(state, { id, changes: { title, content } })
     },
     reactionAdded(state, action: PayloadAction<{ postId: string; reaction: ReactionName }>) {
       const { postId, reaction } = action.payload
