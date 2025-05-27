@@ -28,6 +28,7 @@ interface PostsState {
 export type ReactionName = keyof Reactions
 
 type EditPostType = Pick<Post, 'id' | 'title' | 'content'>
+type NewPost = Pick<Post, 'title' | 'content' | 'user'>
 
 const initialReactions: Reactions = {
   thumbsUp: 0,
@@ -50,12 +51,22 @@ export const fetchPosts = createAppAsyncThunk(
     return response.data
   },
   {
-    condition(arg, thunkApi) {
+    condition(_, thunkApi) {
       const postsStatus = selectPostsStatus(thunkApi.getState())
       if (postsStatus !== 'idle') {
         return false
       }
     },
+  },
+)
+
+export const addNewPost = createAppAsyncThunk(
+  'posts/addNewPost',
+  // The payload creator receives the partial `{title, content, user}` object
+  async (initialPost: NewPost) => {
+    const response = await client.post<Post>('/fakeApi/posts', initialPost)
+
+    return response.data
   },
 )
 
@@ -113,6 +124,9 @@ const postsSlice = createSlice({
         state.status = 'failed'
         state.error = action.error.message ?? 'Unknown Error'
       })
+      .addCase(addNewPost.fulfilled, (state, action) => {
+        state.posts.push(action.payload)
+      })
   },
   selectors: {
     selectAllPosts: (postsState) => postsState.posts,
@@ -122,6 +136,6 @@ const postsSlice = createSlice({
   },
 })
 
-export const { addPost, editPost, addReaction } = postsSlice.actions
+export const { editPost, addReaction } = postsSlice.actions
 export const { selectAllPosts, selectPostById, selectPostsStatus, selectPostsError } = postsSlice.selectors
 export const postsReducer = postsSlice.reducer
