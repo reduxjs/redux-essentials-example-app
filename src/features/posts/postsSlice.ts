@@ -1,7 +1,8 @@
 import { createSlice, nanoid, PayloadAction } from '@reduxjs/toolkit'
-import { sub } from 'date-fns'
 
 import { userLoggedOut } from '@/features/auth/authSlice'
+import { client } from '@/api/client'
+import { createAppAsyncThunk } from '@/app/withTypes'
 
 export interface Post {
   id: string
@@ -18,6 +19,11 @@ export interface Reactions {
   rocket: number
   eyes: number
 }
+interface PostsState {
+  posts: Post[]
+  status: 'idle' | 'pending' | 'succeeded' | 'failed' | 'rejected'
+  error: string | null
+}
 
 export type ReactionName = keyof Reactions
 
@@ -31,24 +37,27 @@ const initialReactions: Reactions = {
   eyes: 0,
 }
 
-const initialState: Post[] = [
-  {
-    id: '1',
-    title: 'First Post!',
-    content: 'Hello!',
-    user: '0',
-    date: sub(new Date(), { minutes: 10 }).toISOString(),
-    reactions: initialReactions,
+const initialState: PostsState = {
+  posts: [],
+  status: 'idle',
+  error: null,
+}
+
+export const fetchPosts = createAppAsyncThunk(
+  'posts/fetchPosts',
+  async () => {
+    const response = await client.get<Post[]>('/fakeApi/posts')
+    return response.data
   },
   {
-    id: '2',
-    title: 'Second Post',
-    content: 'More text',
-    user: '2',
-    date: sub(new Date(), { minutes: 5 }).toISOString(),
-    reactions: initialReactions,
+    condition(arg, thunkApi) {
+      const postsStatus = selectPostsStatus(thunkApi.getState())
+      if (postsStatus !== 'idle') {
+        return false
+      }
+    },
   },
-]
+)
 
 const postsSlice = createSlice({
   name: 'posts',
@@ -56,7 +65,7 @@ const postsSlice = createSlice({
   reducers: {
     addPost: {
       reducer(state, action: PayloadAction<Post>) {
-        state.push(action.payload)
+        state.posts.push(action.payload)
       },
       prepare(title: string, content: string, userId: string) {
         return {
@@ -73,7 +82,7 @@ const postsSlice = createSlice({
     },
     editPost(state, action: PayloadAction<EditPostType>) {
       const { id, title, content } = action.payload
-      const currentPost = state.find((post) => post.id === id)
+      const currentPost = state.posts.find((post) => post.id === id)
 
       if (currentPost) {
         currentPost.title = title
@@ -82,24 +91,37 @@ const postsSlice = createSlice({
     },
     addReaction(state, action: PayloadAction<{ postId: string; reaction: ReactionName }>) {
       const { postId, reaction } = action.payload
-      const existingPost = state.find((post) => post.id === postId)
+      const existingPost = state.posts.find((post) => post.id === postId)
       if (existingPost) {
         existingPost.reactions[reaction]++
       }
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(userLoggedOut, () => {
-      // Clear out the list of posts whenever the user logs out
-      return []
-    })
+    builder
+      .addCase(userLoggedOut, () => {
+        return initialState
+      })
+      .addCase(fetchPosts.pending, (state, action) => {
+        state.status = 'pending'
+      })
+      .addCase(fetchPosts.fulfilled, (state, action) => {
+        state.status = 'succeeded'
+        state.posts.push(...action.payload)
+      })
+      .addCase(fetchPosts.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error = action.error.message ?? 'Unknown Error'
+      })
   },
   selectors: {
-    selectAllPosts: (postsState) => postsState,
-    selectPostById: (postsState, postId: string) => postsState.find((post) => post.id === postId),
+    selectAllPosts: (postsState) => postsState.posts,
+    selectPostById: (postsState, postId: string) => postsState.posts.find((post) => post.id === postId),
+    selectPostsStatus: (postsState) => postsState.status,
+    selectPostsError: (postsState) => postsState.error,
   },
 })
 
 export const { addPost, editPost, addReaction } = postsSlice.actions
-export const { selectAllPosts, selectPostById } = postsSlice.selectors
+export const { selectAllPosts, selectPostById, selectPostsStatus, selectPostsError } = postsSlice.selectors
 export const postsReducer = postsSlice.reducer
