@@ -4,6 +4,7 @@ import { logout } from '@/features/auth/authSlice'
 import { client } from '@/api/client'
 import { createAppAsyncThunk } from '@/app/withTypes'
 import { RootState } from '@/app/types'
+import { AppStartListening } from '@/app/listenerMiddleware'
 
 export interface Post {
   id: string
@@ -131,3 +132,21 @@ export const selectPostsByUser = createSelector(
   // and will run when either input value changes
   (posts, userId) => posts.filter((post) => post.user === userId),
 )
+
+export const addPostsListeners = (startAppListening: AppStartListening) => {
+  startAppListening({
+    actionCreator: addNewPost.fulfilled,
+    effect: async (action, listenerApi) => {
+      const { toast } = await import('react-tiny-toast')
+
+      const toastId = toast.show('New post added!', {
+        variant: 'success',
+        position: 'bottom-right',
+        pause: true
+      })
+
+      await listenerApi.delay(5000)
+      toast.remove(toastId)
+    }
+  })
+}
