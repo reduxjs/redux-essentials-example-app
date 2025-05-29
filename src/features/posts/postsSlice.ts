@@ -133,9 +133,11 @@ const postsSlice = createSlice({
     selectPostById: (postsState, postId: string) => postsState.posts.find((post) => post.id === postId),
     selectPostsStatus: (postsState) => postsState.status,
     selectPostsError: (postsState) => postsState.error,
+    selectPostsByUser: (postsState, userId: string) => postsState.posts.filter((post) => post.user === userId),
   },
 })
 
 export const { editPost, addReaction } = postsSlice.actions
-export const { selectAllPosts, selectPostById, selectPostsStatus, selectPostsError } = postsSlice.selectors
+export const { selectAllPosts, selectPostById, selectPostsStatus, selectPostsError, selectPostsByUser } =
+  postsSlice.selectors
 export const postsReducer = postsSlice.reducer

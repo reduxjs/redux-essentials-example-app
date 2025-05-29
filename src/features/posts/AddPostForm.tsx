@@ -50,7 +50,7 @@ export const AddPostForm = () => {
         <label htmlFor="postContent">Content:</label>
         <textarea id="postContent" name="postContent" defaultValue="" required />
 
-        <button>Save post</button>
+        <button  disabled={addRequestStatus === 'pending'}>Save post</button>
       </form>
     </section>
   )
