@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { memo, useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import { Link } from 'react-router-dom'
 import { fetchPosts, Post, selectAllPosts, selectPostsError, selectPostsStatus } from './postsSlice'
@@ -12,7 +12,7 @@ interface PostExcerptProps {
   post: Post
 }
 
-const PostExcerpt = ({ post }: PostExcerptProps) => {
+const PostExcerpt = memo(({ post }: PostExcerptProps) => {
   return (
     <article className="post-excerpt" key={post.id}>
       <h3>
@@ -26,7 +26,7 @@ const PostExcerpt = ({ post }: PostExcerptProps) => {
       <ReactionButtons post={post} />
     </article>
   )
-}
+})
 
 export const PostsList = () => {
   const dispatch = useAppDispatch()
