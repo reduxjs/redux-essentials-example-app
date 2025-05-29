@@ -1,8 +1,9 @@
-import { createSlice, nanoid, PayloadAction } from '@reduxjs/toolkit'
+import { createSelector, createSlice, nanoid, PayloadAction } from '@reduxjs/toolkit'
 
 import { logout } from '@/features/auth/authSlice'
 import { client } from '@/api/client'
 import { createAppAsyncThunk } from '@/app/withTypes'
+import { RootState } from '@/app/types'
 
 export interface Post {
   id: string
@@ -133,11 +134,25 @@ const postsSlice = createSlice({
     selectPostById: (postsState, postId: string) => postsState.posts.find((post) => post.id === postId),
     selectPostsStatus: (postsState) => postsState.status,
     selectPostsError: (postsState) => postsState.error,
-    selectPostsByUser: (postsState, userId: string) => postsState.posts.filter((post) => post.user === userId),
+    // rewrite selectPostsByUser to be a memoized function with createSelector below
+    // selectPostsByUser: (postsState, userId: string) => postsState.posts.filter((post) => post.user === userId),
   },
 })
 
 export const { editPost, addReaction } = postsSlice.actions
-export const { selectAllPosts, selectPostById, selectPostsStatus, selectPostsError, selectPostsByUser } =
-  postsSlice.selectors
+export const { selectAllPosts, selectPostById, selectPostsStatus, selectPostsError } = postsSlice.selectors
 export const postsReducer = postsSlice.reducer
+
+export const selectPostsByUser = createSelector(
+  [
+    // we can pass in an existing selector function that
+    // reads something from the root `state` and returns it
+    selectAllPosts,
+    // and another function that extracts one of the arguments
+    // and passes that onward
+    (state: RootState, userId: string) => userId,
+  ],
+  // the output function gets those values as its arguments,
+  // and will run when either input value changes
+  (posts, userId) => posts.filter((post) => post.user === userId),
+)
