@@ -2,45 +2,45 @@ import { Link, useParams } from 'react-router-dom'
 
 import { useAppSelector } from '@/app/hooks'
 import { selectCurrentUsername } from '@/features/auth/authSlice'
-import { selectPostById } from './postsSlice'
 import { PostAuthor } from './PostAuthor'
 import { TimeAgo } from '@/components/TimeAgo'
 import { ReactionButtons } from './ReactionButtons'
+import { useGetPostQuery } from '../api/apiSlice'
+import { Spinner } from '@/components/Spinner'
 
 export const SinglePostPage = () => {
   const { postId } = useParams()
 
-  const currentPost = useAppSelector((state) => selectPostById(state, postId!))
-  const currentUsername = useAppSelector(selectCurrentUsername)!
+  const currentUsername = useAppSelector(selectCurrentUsername)
+  const { data: post, isFetching, isSuccess } = useGetPostQuery(postId!)
 
-  if (!currentPost) {
-    return (
-      <section>
-        <h2>Current post not found!</h2>
-      </section>
-    )
-  }
+  let content: React.ReactNode
 
-  const isEditable = currentUsername === currentPost.user
+  const isEditable = currentUsername === post?.user
 
-  return (
-    <section>
+  if (isFetching) {
+    content = <Spinner text="Loading..." />
+  } else if (isSuccess) {
+    content = (
       <article className="post">
-        <h2>{currentPost.title}</h2>
+        <h2>{post.title}</h2>
         <div>
-          <PostAuthor userId={currentPost.user} />
-          <TimeAgo timestamp={currentPost.date} />
+          <PostAuthor userId={post.user} />
+          <TimeAgo timestamp={post.date} />
         </div>
-        <p className="post-content">{currentPost.content}</p>
 
-        <ReactionButtons post={currentPost} />
+        <p className="post-content">{post.content}</p>
+
+        <ReactionButtons post={post} />
 
         {isEditable && (
-          <Link to={`/editPost/${currentPost.id}`} className="button">
+          <Link to={`/editPost/${post.id}`} className="button">
             Edit post
           </Link>
         )}
       </article>
-    </section>
-  )
+    )
+  }
+
+  return <section>{content}</section>
 }
