@@ -28,7 +28,7 @@ interface PostsState extends EntityState<Post, string> {
 
 export type ReactionName = keyof Reactions
 
-type EditPostType = Pick<Post, 'id' | 'title' | 'content'>
+export type EditPostType = Pick<Post, 'id' | 'title' | 'content'>
 export type NewPost = Pick<Post, 'title' | 'content' | 'user'>
 
 

@@ -1,6 +1,5 @@
-import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import { useNavigate, useParams } from 'react-router-dom'
-import { editPost, selectPostById } from './postsSlice'
+import { useEditPostMutation, useGetPostQuery } from '../api/apiSlice'
 
 interface EditPostFormFields extends HTMLFormControlsCollection {
   postTitle: HTMLInputElement
@@ -13,10 +12,11 @@ interface EditPostFormElements extends HTMLFormElement {
 
 export const EditPostForm = () => {
   const { postId } = useParams()
-  const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
-  const currentPost = useAppSelector((state) => selectPostById(state, postId!))
+  const { data: currentPost } = useGetPostQuery(postId!)
+
+  const [updatePost, { isLoading }] = useEditPostMutation()
 
   if (!currentPost) {
     return (
@@ -26,7 +26,7 @@ export const EditPostForm = () => {
     )
   }
 
-  const onSavePostClicked = (e: React.FormEvent<EditPostFormElements>) => {
+  const onSavePostClicked = async (e: React.FormEvent<EditPostFormElements>) => {
     e.preventDefault()
 
     const { elements } = e.currentTarget
@@ -34,7 +34,8 @@ export const EditPostForm = () => {
     const content = elements.postContent.value
 
     if (title && content) {
-      dispatch(editPost({ id: currentPost.id, title, content }))
+      await updatePost({ id: currentPost.id, title, content })
+
       navigate(`/posts/${postId}`)
     }
   }
@@ -49,7 +50,7 @@ export const EditPostForm = () => {
         <label htmlFor="postContent">Content:</label>
         <textarea id="postContent" name="postContent" defaultValue={currentPost.content} required />
 
-        <button>Save post</button>
+        <button disabled={isLoading}>Save post</button>
       </form>
     </section>
   )
