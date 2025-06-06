@@ -1,10 +1,11 @@
-import { createEntityAdapter, createSelector, createSlice, EntityState, nanoid, PayloadAction } from '@reduxjs/toolkit'
+import { createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit'
 
 import { logout } from '@/features/auth/authSlice'
 import { client } from '@/api/client'
 import { createAppAsyncThunk } from '@/app/withTypes'
 import { RootState } from '@/app/types'
 import { AppStartListening } from '@/app/listenerMiddleware'
+import { apiSlice } from '../api/apiSlice'
 
 export interface Post {
   id: string
@@ -30,7 +31,6 @@ export type ReactionName = keyof Reactions
 
 export type EditPostType = Pick<Post, 'id' | 'title' | 'content'>
 export type NewPost = Pick<Post, 'title' | 'content' | 'user'>
-
 
 const postsAdapter = createEntityAdapter<Post>({
   sortComparer: (a, b) => b.date.localeCompare(a.date),
@@ -135,18 +135,18 @@ export const selectPostsByUser = createSelector(
 
 export const addPostsListeners = (startAppListening: AppStartListening) => {
   startAppListening({
-    actionCreator: addNewPost.fulfilled,
+    matcher: apiSlice.endpoints.addNewPost.matchFulfilled,
     effect: async (action, listenerApi) => {
       const { toast } = await import('react-tiny-toast')
 
       const toastId = toast.show('New post added!', {
         variant: 'success',
         position: 'bottom-right',
-        pause: true
+        pause: true,
       })
 
       await listenerApi.delay(5000)
       toast.remove(toastId)
-    }
+    },
   })
 }
