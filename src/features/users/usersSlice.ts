@@ -1,4 +1,4 @@
-import { createEntityAdapter, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createEntityAdapter, createSelector, createSlice, EntityState } from '@reduxjs/toolkit'
 import { selectCurrentUsername } from '../auth/authSlice'
 import { client } from '@/api/client'
 
@@ -33,8 +33,12 @@ const usersSlice = createSlice({
 // the TS types updated to include the injected endpoints
 export const apiSliceWithUsers = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getUsers: builder.query<User[], void>({
+    getUsers: builder.query<EntityState<User, string>, void>({
       query: () => '/users',
+      transformResponse(res: User[]) {
+        // Create a normalized state object containing all the user items
+        return usersAdapter.setAll(initialState, res)
+      },
     }),
   }),
 })
@@ -43,14 +47,10 @@ export const { useGetUsersQuery } = apiSliceWithUsers
 
 export const selectUsersResult = apiSliceWithUsers.endpoints.getUsers.select()
 
-const emptyUsers: User[] = []
-
-export const selectAllUsers = createSelector(selectUsersResult, (usersResult) => usersResult?.data ?? emptyUsers)
-
-export const selectUserById = createSelector(
-  selectAllUsers,
-  (state: RootState, userId: string) => userId,
-  (users, userId) => users.find((user) => user.id === userId),
+const selectUsersData = createSelector(
+  selectUsersResult,
+  // Fall back to the empty entity state if no response yet.
+  (result) => result.data ?? initialState,
 )
 
 export const selectCurrentUser = (state: RootState) => {
@@ -61,3 +61,5 @@ export const selectCurrentUser = (state: RootState) => {
 }
 
 export const usersReducer = usersSlice.reducer
+
+export const { selectAll: selectAllUsers, selectById: selectUserById } = usersAdapter.getSelectors(selectUsersData)
