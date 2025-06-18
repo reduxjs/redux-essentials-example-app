@@ -1,7 +1,5 @@
-import { useAppDispatch } from '@/app/hooks'
-
 import type { Post, ReactionName } from './postsSlice'
-import { addReaction } from './postsSlice'
+import { useAddReactionMutation } from '../api/apiSlice'
 
 const reactionEmoji: Record<ReactionName, string> = {
   thumbsUp: '👍',
@@ -16,7 +14,7 @@ interface ReactionButtonsProps {
 }
 
 export const ReactionButtons = ({ post }: ReactionButtonsProps) => {
-  const dispatch = useAppDispatch()
+  const [addReaction] = useAddReactionMutation()
 
   const reactionButtons = Object.entries(reactionEmoji).map(([stringName, emoji]) => {
     const reaction = stringName as ReactionName
@@ -26,7 +24,7 @@ export const ReactionButtons = ({ post }: ReactionButtonsProps) => {
         key={reaction}
         type="button"
         className="muted-button reaction-button"
-        onClick={() => dispatch(addReaction({ postId: post.id, reaction }))}
+        onClick={() => addReaction({ postId: post.id, reaction })}
       >
         {emoji} {post.reactions[reaction]}
       </button>
