@@ -34,9 +34,7 @@ export const PostsList = () => {
   const { data: posts = [], isLoading, isFetching, isSuccess, isError, error } = useGetPostsQuery()
 
   const sortedPosts = useMemo(() => {
-    const sortedPosts = posts.slice()
-    sortedPosts.sort((a, b) => b.date.localeCompare(a.date))
-    return sortedPosts
+    return [...posts].sort((a, b) => b.date.localeCompare(a.date))
   }, [posts])
 
   let content: React.ReactNode
