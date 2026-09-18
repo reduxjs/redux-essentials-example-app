@@ -3,18 +3,18 @@
   "version": "2.0.0",
   "private": true,
   "dependencies": {
-    "@faker-js/faker": "^8",
+    "@faker-js/faker": "^10",
     "@mswjs/data": "^0.16",
-    "@reduxjs/toolkit": "^2.2",
-    "classnames": "^2.2.6",
-    "date-fns": "^3",
-    "mock-socket": "^9.0.3",
-    "msw": "^2",
-    "react": "^18",
-    "react-dom": "^18",
-    "react-redux": "^9",
-    "react-router-dom": "^6",
-    "react-tiny-toast": "^2.0.1"
+    "@reduxjs/toolkit": "^2.12",
+    "classnames": "^2.5",
+    "date-fns": "^4",
+    "mock-socket": "^9.3",
+    "msw": "^2.15",
+    "react": "^19",
+    "react-dom": "^19",
+    "react-redux": "^9.3",
+    "react-router-dom": "^7",
+    "react-tiny-toast": "^2.1"
   },
   "scripts": {
     "dev": "vite",
@@ -23,16 +23,15 @@
     "format": "prettier --write ./src/**/*.{ts,tsx,css}"
   },
   "devDependencies": {
-    "@types/node": "^20.11.6",
-    "@types/react": "^18.2.47",
-    "@types/react-dom": "^18.2.18",
-    "@vitejs/plugin-react": "^4.2.1",
-    "prettier": "^3.2.1",
-    "typescript": "^5.4",
-    "vite": "^5.0.11"
+    "@types/node": "^24",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6",
+    "prettier": "^3.9",
+    "typescript": "^7",
+    "vite": "^8"
   },
-  "msw": {
-    "workerDirectory": "public"
-  },
-  "packageManager": "yarn@4.2.2"
+  "overrides": {
+    "rolldown": "1.2.8"
+  }
 }

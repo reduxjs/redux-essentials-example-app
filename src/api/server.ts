@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw'
-import { setupWorker } from 'msw/browser'
+import { setupServer } from 'msw/native'
 import { factory, oneOf, manyOf, primaryKey } from '@mswjs/data'
 import { nanoid } from '@reduxjs/toolkit'
 import { faker } from '@faker-js/faker/locale/en'
@@ -109,7 +109,7 @@ const createUserData = () => {
     firstName,
     lastName,
     name: `${firstName} ${lastName}`,
-    username: faker.internet.userName(),
+    username: faker.internet.username(),
   }
 }
 
@@ -244,8 +244,9 @@ export const handlers = [
   }),
 ]
 
-export const worker = setupWorker(...handlers)
-// worker.printHandlers() // Optional: nice for debugging to see all available route handlers that will be intercepted
+// `msw/native` patches `fetch` directly instead of registering a service worker.
+// WebContainer-based sandboxes (StackBlitz) cannot register app service workers.
+export const worker = setupServer(...handlers)
 
 /* Mock Websocket Setup */
 
