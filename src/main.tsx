@@ -14,7 +14,7 @@ import './index.css'
 // Wrap app rendering so we can wait for the mock API to initialize
 async function start() {
   // Start our mock API server
-  await worker.start({ onUnhandledRequest: 'bypass' })
+  worker.listen({ onUnhandledRequest: 'bypass' })
 
   store.dispatch(fetchUsers())
 
